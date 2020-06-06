@@ -7,11 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */ = {isa = PBXBuildFile; fileRef = 998A91A6248C10BC004C21E5 /* PrefixList.xml */; };
+		998A91A9248C1179004C21E5 /* PrefixFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91A8248C1179004C21E5 /* PrefixFileParser.swift */; };
+		998A91AB248C11B6004C21E5 /* XmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91AA248C11B6004C21E5 /* XmlParser.swift */; };
+		998A91AD248C11E8004C21E5 /* PrefixData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91AC248C11E8004C21E5 /* PrefixData.swift */; };
 		999D8714248BF1100031B407 /* CallParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 999D8712248BF1100031B407 /* CallParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		999D871B248C07ED0031B407 /* CallLookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999D871A248C07ED0031B407 /* CallLookup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		998A91A6248C10BC004C21E5 /* PrefixList.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrefixList.xml; sourceTree = "<group>"; };
+		998A91A8248C1179004C21E5 /* PrefixFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixFileParser.swift; sourceTree = "<group>"; };
+		998A91AA248C11B6004C21E5 /* XmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XmlParser.swift; sourceTree = "<group>"; };
+		998A91AC248C11E8004C21E5 /* PrefixData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixData.swift; sourceTree = "<group>"; };
 		999D870F248BF1100031B407 /* CallParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CallParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		999D8712248BF1100031B407 /* CallParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallParser.h; sourceTree = "<group>"; };
 		999D8713248BF1100031B407 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -29,6 +37,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		998A91A5248C105E004C21E5 /* Support Files */ = {
+			isa = PBXGroup;
+			children = (
+				998A91A6248C10BC004C21E5 /* PrefixList.xml */,
+			);
+			path = "Support Files";
+			sourceTree = "<group>";
+		};
 		999D8705248BF1100031B407 = {
 			isa = PBXGroup;
 			children = (
@@ -48,9 +64,13 @@
 		999D8711248BF1100031B407 /* CallParser */ = {
 			isa = PBXGroup;
 			children = (
+				998A91A5248C105E004C21E5 /* Support Files */,
 				999D8712248BF1100031B407 /* CallParser.h */,
 				999D8713248BF1100031B407 /* Info.plist */,
 				999D871A248C07ED0031B407 /* CallLookup.swift */,
+				998A91A8248C1179004C21E5 /* PrefixFileParser.swift */,
+				998A91AA248C11B6004C21E5 /* XmlParser.swift */,
+				998A91AC248C11E8004C21E5 /* PrefixData.swift */,
 			);
 			path = CallParser;
 			sourceTree = "<group>";
@@ -125,6 +145,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,7 +156,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				998A91A9248C1179004C21E5 /* PrefixFileParser.swift in Sources */,
 				999D871B248C07ED0031B407 /* CallLookup.swift in Sources */,
+				998A91AB248C11B6004C21E5 /* XmlParser.swift in Sources */,
+				998A91AD248C11E8004C21E5 /* PrefixData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
