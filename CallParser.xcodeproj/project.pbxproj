@@ -8,12 +8,14 @@
 
 /* Begin PBXBuildFile section */
 		999D8714248BF1100031B407 /* CallParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 999D8712248BF1100031B407 /* CallParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		999D871B248C07ED0031B407 /* CallLookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999D871A248C07ED0031B407 /* CallLookup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		999D870F248BF1100031B407 /* CallParser.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CallParser.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		999D8712248BF1100031B407 /* CallParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallParser.h; sourceTree = "<group>"; };
 		999D8713248BF1100031B407 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		999D871A248C07ED0031B407 /* CallLookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallLookup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -48,6 +50,7 @@
 			children = (
 				999D8712248BF1100031B407 /* CallParser.h */,
 				999D8713248BF1100031B407 /* Info.plist */,
+				999D871A248C07ED0031B407 /* CallLookup.swift */,
 			);
 			path = CallParser;
 			sourceTree = "<group>";
@@ -95,6 +98,7 @@
 				TargetAttributes = {
 					999D870E248BF1100031B407 = {
 						CreatedOnToolsVersion = 11.5;
+						LastSwiftMigration = 1150;
 					};
 				};
 			};
@@ -131,6 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				999D871B248C07ED0031B407 /* CallLookup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -259,6 +264,7 @@
 		999D8718248BF1100031B407 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -277,6 +283,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.w6op.CallParser;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -284,6 +291,7 @@
 		999D8719248BF1100031B407 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
