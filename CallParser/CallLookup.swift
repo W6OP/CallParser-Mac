@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import Combine
 
 public struct HitList {
     var call = ""                   //call sign as input
@@ -41,7 +42,7 @@ public struct HitList {
 /**
  Look up the data on a call sign.
  */
-public struct CallLookup {
+public class CallLookup: ObservableObject{
     
     // EndingPreserve = ':R:P:M:';
     // EndingIgnore = ':AM:MM:QRP:A:B:BCN:LH:';
@@ -78,7 +79,7 @@ public struct CallLookup {
      - parameters:
      - callSign: The call sign we want to process.
      */
-    public mutating func lookupCall(call: String) throws -> [HitList] {
+    public func lookupCall(call: String) throws -> [HitList] {
       
             self.processCallSign(callSign: call.uppercased())
      
@@ -91,7 +92,7 @@ public struct CallLookup {
      - parameters:
      - call: The call sign to be processed.
      */
-    mutating func processCallSign(callSign: String) {
+    func processCallSign(callSign: String) {
         
         var prefix = ""
         var call = callSign
@@ -131,7 +132,7 @@ public struct CallLookup {
      - parameters:
      - callSign: The call sign we are working with.
      */
-    mutating func collectMatches(callSign: String) {
+    func collectMatches(callSign: String) {
         
         var callPart = callSign.prefix(4)
         var matches = prefixList.filter({ $0.mainPrefix == callPart})
@@ -171,7 +172,7 @@ public struct CallLookup {
      - callSign: The call sign we are working with.
      - numberPart: The number in the call.
      */
-    mutating func searchSecondaryPrefixes(callSign: String) -> [PrefixData] {
+    func searchSecondaryPrefixes(callSign: String) -> [PrefixData] {
         
         var maxCount = 0
         var match = false
@@ -212,7 +213,7 @@ public struct CallLookup {
      - parameters:
      - callSign: the call sign to search with.
      */
-    mutating func searchChildren(callSign: String) {
+    func searchChildren(callSign: String) {
 
         let callSetList = getCallSetList(callSign: callSign)
         
@@ -233,7 +234,7 @@ public struct CallLookup {
      - matches: The array of PrefixData to look at.
      - callSign: The call sign we are working with.
      */
-    mutating func processMatches(matches: [PrefixData], callSign: String) {
+    func processMatches(matches: [PrefixData], callSign: String) {
         
         var callSet: Set<String>
         var callSetList = [Set<String>]()
@@ -296,7 +297,7 @@ public struct CallLookup {
      - prefixData: The prefixData to add to the array.
      - callSign: The call sign we are working with.
      */
-        mutating func populateHitList(prefixData: PrefixData, callSign: String) {
+        func populateHitList(prefixData: PrefixData, callSign: String) {
             
             if hitList == nil {
                 hitList = [HitList]()

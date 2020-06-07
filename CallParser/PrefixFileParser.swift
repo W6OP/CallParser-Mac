@@ -171,7 +171,7 @@ enum PrefixKind:  String {
 // MARK: - CallParser Class ----------------------------------------------------------------------------
 
 @available(OSX 10.14, *)
-public class PrefixFileParser: NSObject {
+public class PrefixFileParser: NSObject, ObservableObject {
     
     public var prefixList = [PrefixData]()
     public var childPrefixList = [PrefixData]()
@@ -183,6 +183,8 @@ public class PrefixFileParser: NSObject {
     // initializer
     public override init() {
         super.init()
+      
+      parsePrefixFile()
     }
     
     /**
