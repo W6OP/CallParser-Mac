@@ -174,6 +174,8 @@ enum PrefixKind:  String {
 public class PrefixFileParser: NSObject, ObservableObject {
     
     public var prefixList = [PrefixData]()
+    public var callSignDictionary = [String: PrefixData]()
+    public var portablePrefixes = [String: PrefixData]()
     public var childPrefixList = [PrefixData]()
     var prefixData = PrefixData()
     
@@ -188,24 +190,25 @@ public class PrefixFileParser: NSObject, ObservableObject {
     }
     
     /**
-     Start parsing the embeddied xml file
+     Start parsing the embedded xml file
      - parameters:
      */
-    public func parsePrefixFile() { // -> [PrefixData]
+    public func parsePrefixFile() {
         
         recordKey = "prefix"
         
+      // define the bundle
         let bundle = Bundle(identifier: "com.w6op.CallParser")
         guard let url = bundle!.url(forResource: "PrefixList", withExtension: "xml") else {
             print("Invalid call sign: ")
-            return //prefixList
+            return
             // later make this throw
         }
         
         // define the xmlParser
         guard let parser = XMLParser(contentsOf: url) else {
             print("Parser init failed: ")
-            return //prefixList
+            return
             // later make this throw
         }
         
@@ -213,31 +216,43 @@ public class PrefixFileParser: NSObject, ObservableObject {
         if parser.parse() {
             // if this is the first instance of that prefix continue to next item in list
             // put all the children in their parent
-            var count = 0
+            //var count = 0
             for i in 0..<self.prefixList.count {
-                if prefixList[i].kind == PrefixKind.pfDXCC {
-                    count = i
-                } else {
-                    prefixList[count].hasChildren = true
-                    prefixList[count].children.append(prefixList[i])
-                    // save the children's masks in the parent
-                    for mask in prefixList[i].primaryMaskSets {
-                        prefixList[count].secondaryMaskSets.append(mask)
-                    }
-                }
+              for mask in prefixList[i].primaryMaskSets {
+                _ = mask.count
+                //let primaryMaskList = expandMask(element: mask)
+              }
+             //
+//                if prefixList[i].kind == PrefixKind.pfDXCC {
+//                    count = i
+//                } else {
+//                    //prefixList[count].hasChildren = true
+//                    //prefixList[count].children.append(prefixList[i])
+//                    // save the children's masks in the parent
+//                    for mask in prefixList[i].primaryMaskSets {
+//                        prefixList[count].secondaryMaskSets.append(mask)
+//                    }
+//                }
             }
         }
         
         // remove all the children and store them separately
-        for (i,prefix) in prefixList.enumerated().reversed()
-        {
-            if prefix.isParent == false
-            {
-                childPrefixList.append(prefix)
-                prefixList.remove(at: i)
-            }
-        }
+//        for (i,prefix) in prefixList.enumerated().reversed()
+//        {
+//            if prefix.isParent == false
+//            {
+//                childPrefixList.append(prefix)
+//                prefixList.remove(at: i)
+//            }
+//        }
         
         //return prefixList
     }
+  
+  func expandMask(element: String) -> Set<[String]> {
+    
+    
+    
+    return Set<[String]>()
+  }
 } // end class

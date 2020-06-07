@@ -15,9 +15,9 @@ public struct HitList {
     var country = ""                //country
     var province = ""               //province
     var city = ""                   //city
-    var dxcc_entity = ""            //dxcc_entity
-    var cq = ""                     //cq_zone
-    var itu = ""                    //itu_zone
+    var dxcc_entity = 0            //dxcc_entity
+    var cq = Set<Int>()                    //cq_zone
+    var itu = Set<Int>()                   //itu_zone
     var continent = ""              //continent
     var timeZone = ""               //time_zone
     var latitude = "0.0"            //lat
@@ -248,16 +248,16 @@ public class CallLookup: ObservableObject{
         
         for match in matches {
             populateHitList(prefixData: match, callSign: callSign)
-            if match.hasChildren {
-                // now go through each child and find intersections
-                for child in match.children {
-                    for mask in child.primaryMaskSets{
-                        if compareMask(mask: mask, callSetList: callSetList) {
-                            populateHitList(prefixData: child, callSign: callSign)
-                        }
-                    }
-                }
-            }
+//            if match.hasChildren {
+//                // now go through each child and find intersections
+//                for child in match.children {
+//                    for mask in child.primaryMaskSets{
+//                        if compareMask(mask: mask, callSetList: callSetList) {
+//                            populateHitList(prefixData: child, callSign: callSign)
+//                        }
+//                    }
+//                }
+//            }
         }
     }
     

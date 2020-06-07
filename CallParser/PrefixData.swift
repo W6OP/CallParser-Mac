@@ -27,17 +27,17 @@ public struct PrefixData {
     var country = ""                //country
     var province = ""               //province
     var city = ""                    //city
-    var dxcc_entity = ""                   //dxcc_entity
-    var cq = ""                     //cq_zone
-    var itu = ""                    //itu_zone
+    var dxcc_entity = 0              //dxcc_entity
+    var cq = Set<Int>()           //cq_zone
+    var itu = Set<Int>()                    //itu_zone
     var continent = ""              //continent
     var timeZone = ""               //time_zone
     var latitude = "0.0"            //lat
     var longitude = "0.0"           //long
     
-    var isParent = false
-    var hasChildren = false
-    var children = [PrefixData]()
+    //var isParent = false
+    //var hasChildren = false
+    //var children = [PrefixData]()
     // expanded masks
     var expandedMaskSetList: [Set<String>]
     var primaryMaskSets: [[Set<String>]]
@@ -46,7 +46,7 @@ public struct PrefixData {
     
     
     var adif = false
-    var wae = ""
+    var wae = 0
     var wap = ""
     var admin1 = ""
     var admin2 = ""
@@ -80,17 +80,17 @@ public struct PrefixData {
      - fullPrefix: fullPrefix value.
      */
     mutating func setMainPrefix(fullPrefix: String) {
-        if let index = fullPrefix.range(of: ".")?.lowerBound {
-            mainPrefix = String(fullPrefix[..<index])
+      if let index = fullPrefix.range(of: ".")?.upperBound {
+        mainPrefix = String(fullPrefix[index...])
         } else {
-            mainPrefix = fullPrefix // don't know why this is necessary but Alex does it
+            mainPrefix = fullPrefix
         }
     }
     
     /**
      If this is a top level set the kind and adif flags.
      - parameters:
-     - prefixKind: PrefixKind.
+     - prefixKind: PrefixKind
      */
     mutating func setDXCC(prefixKind: PrefixKind) {
        
@@ -98,11 +98,23 @@ public struct PrefixData {
         
         if prefixKind == PrefixKind.pfDXCC {
             adif = true
-            isParent = true
+            //isParent = true
         } else {
             
         }
     }
+  
+  /**
+   Some entities have multiple CQ and ITU zones
+   - parameters:
+   - zones: String
+   */
+  mutating func buildZoneList(zones: String) -> Set<Int> {
+    
+    let zoneArrayString = zones.split(separator: ",")
+    
+    return Set(zoneArrayString.map { Int($0)! })
+  }
     
     /**
      Save the original unexpanded mask.
@@ -149,7 +161,7 @@ public struct PrefixData {
                 let nextIndex = mask.index(mask.startIndex, offsetBy: counter)
                 newMask = String(mask[nextIndex..<mask.endIndex])
             default: // single character
-                expandedMask = Set<String>([])
+                //expandedMask = Set<String>([])
                 expandedMask.insert(String(item))
                 expandedMaskSetList.append(expandedMask)
                 counter += 1

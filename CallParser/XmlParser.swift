@@ -63,18 +63,17 @@ extension PrefixFileParser: XMLParserDelegate {
             prefixData.fullPrefix = currentValue ?? ""
             prefixData.setMainPrefix(fullPrefix: currentValue ?? "")
         case "kind":
-            //prefixData.kind =
             prefixData.setDXCC(prefixKind: PrefixKind(rawValue: currentValue ?? PrefixKind.pfNone.rawValue)!)
         case "country":
             prefixData.country  = currentValue ?? ""
         case "province":
             prefixData.province  = currentValue ?? ""
         case "dxcc_entity":
-            prefixData.dxcc_entity  = currentValue ?? ""
+          prefixData.dxcc_entity  = Int(currentValue ?? "0") ?? 0
         case "cq_zone":
-            prefixData.cq  = currentValue ?? ""
+          prefixData.cq  = prefixData.buildZoneList(zones: currentValue ?? "0")
         case "itu_zone":
-            prefixData.itu  = currentValue ?? ""
+            prefixData.itu  = prefixData.buildZoneList(zones: currentValue ?? "0")
         case "continent":
             prefixData.continent  = currentValue ?? ""
         case "time_zone":
@@ -88,7 +87,7 @@ extension PrefixFileParser: XMLParserDelegate {
         case "wap_entity":
             prefixData.wap = currentValue ?? ""
         case "wae_entity":
-            prefixData.wae = currentValue ?? ""
+            prefixData.wae = Int(currentValue ?? "0") ?? 0
         case "province_id":
             prefixData.admin1 = currentValue ?? ""
         case "start_date":
