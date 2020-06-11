@@ -11,7 +11,7 @@ import Combine
 
 public struct HitList {
     var call = ""                   //call sign as input
-    var kind = PrefixKind.pfNone    //kind
+    var kind = PrefixKind.None    //kind
     var country = ""                //country
     var province = ""               //province
     var city = ""                   //city

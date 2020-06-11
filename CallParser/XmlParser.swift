@@ -56,6 +56,7 @@ extension PrefixFileParser: XMLParserDelegate {
       switch (nodeName){
       case "mask":
         prefixData.expandedMaskList = expandMask(element: currentValue)
+        buildPattern(primaryMaskList: prefixData.expandedMaskList)
         //prefixData.storeMask(mask: currentValue )
         //prefixData.rawMasks.append(currentValue )
       case "label":

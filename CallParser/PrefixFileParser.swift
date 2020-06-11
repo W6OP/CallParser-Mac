@@ -162,16 +162,16 @@ extension Substring {
 // MARK: - PrefixKind Struct ----------------------------------------------------------------------------
 
 enum PrefixKind:  String {
-    case pfNone
-    case pfDXCC
-    case pfProvince
-    case pfStation
-    case pfDelDXCC
-    case pfOldPrefix
-    case pfNonDXCC
-    case pfInvalidPrefix
-    case pfDelProvince
-    case pfCity
+    case None
+    case DXCC
+    case Province
+    case Station
+    case DelDXCC
+    case OldPrefix
+    case NonDXCC
+    case InvalidPrefix
+    case DelProvince
+    case City
 }
 
 // MARK: - CallParser Class ----------------------------------------------------------------------------
@@ -180,8 +180,8 @@ enum PrefixKind:  String {
 public class PrefixFileParser: NSObject, ObservableObject {
     
     public var prefixList = [PrefixData]()
-    public var callSignDictionary = [String: PrefixData]()
-    public var portablePrefixes = [String: PrefixData]()
+    public var callSignDictionary = [String: [PrefixData]]()
+    public var portablePrefixes = [String: [PrefixData]]()
     public var childPrefixList = [PrefixData]()
     var prefixData = PrefixData()
     
@@ -204,18 +204,10 @@ public class PrefixFileParser: NSObject, ObservableObject {
         
         recordKey = "prefix"
         
-      /**
-       if let path = Bundle.main.url(forResource: "Books", withExtension: "xml") {
-           if let parser = XMLParser(contentsOf: path) {
-               parser.delegate = self
-               parser.parse()
-           }
-       }
-       */
       // define the bundle
         let bundle = Bundle(identifier: "com.w6op.CallParser")
         guard let url = bundle!.url(forResource: "PrefixList", withExtension: "xml") else {
-            print("Invalid call sign: ")
+            print("Invalid prefix file: ")
             return
             // later make this throw
         }
@@ -231,31 +223,15 @@ public class PrefixFileParser: NSObject, ObservableObject {
       
         // this is called when the parser has completed parsing the document
         if parser.parse() {
-            // if this is the first instance of that prefix continue to next item in list
-            // put all the children in their parent
-            //var count = 0
-            for i in 0..<self.prefixList.count {
-              for mask in prefixList[i].primaryMaskSets {
-                _ = mask.count
-                //let primaryMaskList = expandMask(element: mask)
-              }
-             //
-//                if prefixList[i].kind == PrefixKind.pfDXCC {
-//                    count = i
-//                } else {
-//                    //prefixList[count].hasChildren = true
-//                    //prefixList[count].children.append(prefixList[i])
-//                    // save the children's masks in the parent
-//                    for mask in prefixList[i].primaryMaskSets {
-//                        prefixList[count].secondaryMaskSets.append(mask)
-//                    }
-//                }
-            }
+//            for i in 0..<self.prefixList.count {
+//
+//            }
         }
     }
   
+
   /**
-   
+   Expand the masks by expanding the meta characters (@#?) and the groups [1-7]
    */
   func expandMask(element: String) -> [[String]] {
     var primaryMaskList = [[String]]()
@@ -274,12 +250,9 @@ public class PrefixFileParser: NSObject, ObservableObject {
             let substring = mask[start..<end]
             // [JT]
             primaryMaskList.append(expandGroup(group: String(substring)))
-            
             for _ in substring {
               position += 1
             }
-            
-          
         } else {
           let char = mask[mask.index(offset, offsetBy: position)] //mask[position]
           let subItem = expandMetaCharacters(mask: String(char))
@@ -288,19 +261,73 @@ public class PrefixFileParser: NSObject, ObservableObject {
           position += 1
         }
       }
- 
+    
     return primaryMaskList
   }
   
   /**
-   Build the array from the mask
+   Build the pattern from the mask
    */
-  func buildArray(charList: [String], expandedmask: String) -> [String] {
+  func buildPattern(primaryMaskList: [[String]]) {
+    var pattern = ""
+    var patternList = [String]()
     
+    for maskPart in primaryMaskList {
+      if maskPart.allSatisfy({$0.isInteger}){
+        pattern += "#"
+      } else if maskPart.allSatisfy({!$0.isInteger}){
+        switch maskPart[0] {
+        case "/":
+          pattern += "/"
+        case ".":
+          pattern += "."
+        default:
+          pattern += "@"
+        }
+      } else { // "?"
+        pattern += "?"
+      }
+    }
     
-    return [String]()
+    if pattern.contains("?") {
+      // # @  - only one (invalid prefix) has two ?  -- @# @@
+      patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
+      patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
+      savePatternList(patternList: patternList)
+    }
+    
+    patternList.append(pattern)
+    savePatternList(patternList: patternList)
   }
   
+  /**
+   Build the portablePrefix and callSignDictionaries.
+   */
+  func savePatternList(patternList: [String]) {
+    
+    for pattern in patternList {
+      switch pattern.suffix(1) {
+      case "/":
+        if var valueExists = portablePrefixes[pattern] {
+          valueExists.append(prefixData)
+        } else {
+          portablePrefixes[pattern] = [PrefixData](arrayLiteral: prefixData)
+        }
+      default:
+        if prefixData.kind != PrefixKind.InvalidPrefix {
+          if var valueExists = callSignDictionary[pattern] {
+            valueExists.append(prefixData)
+          } else {
+            callSignDictionary[pattern] = [PrefixData](arrayLiteral: prefixData)
+          }
+        }
+      }
+    }
+  }
+ 
+  /**
+   
+   */
   func expandGroup(group: String) -> [String]{
     
     var maskList = [String]()
@@ -347,7 +374,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
     var expandedCharacters: String
     
     expandedCharacters = mask.replacingOccurrences(of: "#", with: "0123456789")
-    expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: " ")
     expandedCharacters = expandedCharacters.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
     //expando = expando.replacingOccurrences(of: "-", with: "...")
    
