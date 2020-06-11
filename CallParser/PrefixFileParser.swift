@@ -252,203 +252,44 @@ public class PrefixFileParser: NSObject, ObservableObject {
 //                }
             }
         }
-        
-        // remove all the children and store them separately
-//        for (i,prefix) in prefixList.enumerated().reversed()
-//        {
-//            if prefix.isParent == false
-//            {
-//                childPrefixList.append(prefix)
-//                prefixList.remove(at: i)
-//            }
-//        }
-        
-        //return prefixList
     }
-  
-  func expandMaskXXX(element: String) -> [String] {
-    
-    var maskPart: String
-    var counter = 0
-    var index = 0
-    var expandedMask = ""
-    var maskCharacter = ""
-    var metaCharacters: [String] = ["@", "#", "?", "-", "." ]
-    
-    var mask = element.trimmingCharacters(in: .whitespacesAndNewlines)
-    // preserve the original length
-    let length = mask.count
-    
-    while counter < length
-    {
-      
-      
-      maskCharacter = String(mask.prefix(1))
-      
-      switch maskCharacter {
-      case "[":
-        let index = mask.firstIndex(of: "]")!
-        let nextIndex = mask.index(after: index)
-        let maskPart = mask.prefix(upTo: nextIndex)
-        counter += maskPart.count
-        // get remainder past "]"
-        mask = String(maskPart.suffix(from: nextIndex))
-        let combinedResult = metaCharacters.contains(where: maskPart.contains)
-        if combinedResult {
-          mask += expandMetaCharacters(mask: mask)
-        }
-        expandedMask += maskPart
-      case "@", "#", "?", ".":
-        expandedMask += "[\(maskCharacter)]"
-        counter += 1
-        if counter < length
-        {
-          mask = String(mask.prefix(1))
-        }
-      default:
-        expandedMask += "[\(maskCharacter)]"
-        counter += 1
-        if counter < length
-        {
-          mask = String(mask.prefix(1))
-        }
-        break
-      }
-
-      
-      var charList = [String]()
-      charList = buildArray(charList: charList, expandedmask: expandedMask)
-      
-    }
-    
-    
-    return [String]()
-  }
   
   /**
    
    */
-  func expandMask(element: String) -> [String] {
-    var array: [String]
+  func expandMask(element: String) -> [[String]] {
     var primaryMaskList = [[String]]()
     
     let mask = element.trimmingCharacters(in: .whitespacesAndNewlines)
     
     var position = 0
+    let offset = mask.startIndex
     
-    while position < mask.count {
-      // determine if the first character is a "[" [JT][019]
-      if mask.prefix(1).rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) != nil {
-        if mask.prefix(position + 1) == "[" {
-          if let index = mask.index(of: "[") {
-            let end = mask.endIndex(of: "]")!
-            let substring = mask[index..<end]
+      while position < mask.count {
+        // determine if the first character is a "[" [JT][019]
+        if mask[mask.index(offset, offsetBy: position)] == "[" {
+            let start = mask.index(offset, offsetBy: position)
+          let remainder = mask[mask.index(offset, offsetBy: position)..<mask.endIndex]
+            let end = remainder.endIndex(of: "]")!
+            let substring = mask[start..<end]
             // [JT]
             primaryMaskList.append(expandGroup(group: String(substring)))
             
             for _ in substring {
               position += 1
             }
-
-          }
+            
+          
         } else {
-          let char = mask[position]
+          let char = mask[mask.index(offset, offsetBy: position)] //mask[position]
           let subItem = expandMetaCharacters(mask: String(char))
           let subArray = subItem.map { String($0) }
           primaryMaskList.append(subArray)
           position += 1
         }
       }
-    }
-    
-    
-    let str = "abcde"
-    if let index = str.index(of: "cd") {
-        let substring = str[..<index]   // ab
-        let string = String(substring)
-        print(string)  // "ab\n"
-    }
-    
-    
-    
-//    let firstCharacter = mask.prefix(1)
-//    switch firstCharacter {
-//    case "[":
-//      // take this char and up to and including "]"
-//
-//      let start = mask.startIndex
-//      let end = mask.firstIndex(of: "]")
-//      let range = start..<end
-////
-////      let subStr = mask[range]
-//
-//
-//
-//      let index = mask.firstIndex(of: "]")
-//      let group = expandGroup(group: mask[start..<index])
-//      break
-//    default:
-//      primaryMaskList.append([String](arrayLiteral: String(firstCharacter)))
-//    }
-//
-//
-//
-//
-//    // get index to the first "["
-//    if let index = mask.first(where: {$0 == "["}) {
-//      // get the substring inside [JT]
-//      for item in mask {
-//        if item == "]"  {
-//
-//
-//        } else {
-//          primaryMaskList.append([String](arrayLiteral: String(item)))
-//        }
-//      }
-//
-//
-//
-//
-//    } else {
-//      array = mask.map { String($0) }
-//      // now expand #@?
-//      for item in array {
-//        if item == "#" || item == "@" || item == "?" {
-//          let subItem = expandMetaCharacters(mask: item)
-//          let subArray = subItem.map { String($0) }
-//          primaryMaskList.append(subArray)
-//        } else {
-//          //let subItem = expandMetaCharacters(mask: item)
-//          primaryMaskList.append([String](arrayLiteral: item))
-//        }
-//      }
-//    }
-    
-    
-    
-//    if mask.prefix(1) == "[" {
-//      array = mask.components(separatedBy: CharacterSet(charactersIn: "[]")).filter({ $0 != ""})
-//      for item in array {
-//        if item.count > 1 {
-//          let subItem = expandMetaCharacters(mask: item)
-//          let subArray = subItem.map { String($0) }
-//          primaryMaskList.append(subArray)
-//        } else {
-//          let subItem = expandMetaCharacters(mask: item)
-//          primaryMaskList.append([String](arrayLiteral: subItem))
-//        }
-//      }
-//    } else {
-//      let subItem = expandMetaCharacters(mask: mask)
-//      array = subItem.map { String($0) }
-//      primaryMaskList.append(array)
-//    }
-    
-    
-    
-    
-    
-    return [String]()
+ 
+    return primaryMaskList
   }
   
   /**
@@ -463,7 +304,6 @@ public class PrefixFileParser: NSObject, ObservableObject {
   func expandGroup(group: String) -> [String]{
     
     var maskList = [String]()
-    //let mask = group.dropFirst().dropLast()
     
     let array = group.components(separatedBy: CharacterSet(charactersIn: "[]")).filter({ $0 != ""})
     
@@ -492,81 +332,26 @@ public class PrefixFileParser: NSObject, ObservableObject {
       }
     }
     
-//    for item in array {
-//      let subArray = item.map { String($0) }
-//      for item in subArray {
-//        switch item{
-//        case "#", "@", "?":
-//          let subItem = expandMetaCharacters(mask: item)
-//          let subArray = subItem.map { String($0) }
-//          maskList.append(contentsOf: subArray)
-//        case "-":
-//          let first = subArray.before("-")!
-//          let second = subArray.after("-")!
-//          let subArray = expandRange(first: String(first), second: String(second))
-//          //let subArray = subItem.map { String($0) }
-//          maskList.append(contentsOf: subArray)
-//          break
-//        default:
-//          maskList.append(contentsOf: [String](arrayLiteral: item))
-//        }
-//      }
-//    }
-    
-    
     return maskList
   }
   
-  
-  
-  
-  
-  
-  
   /**
-   
+   Replace meta characters with the strings they represent.
+   No point in doing if # exists as strings are very short.
+   # = digits, @ = alphas and ? = alphas and numerics
+   -parameters:
+   -String:
    */
   func expandMetaCharacters(mask: String) -> String {
 
-    var expando = mask
+    var expandedCharacters: String
     
-    expando = mask.replacingOccurrences(of: "#", with: "0123456789")
-    expando = expando.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-    expando = expando.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-    expando = expando.replacingOccurrences(of: "-", with: "...")
-    
-//    switch mask {
-//    case "#":
-//      expando = mask.replacingOccurrences(of: "#", with: "0123456789")
-//      break
-//      case "@":
-//        expando = mask.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-//      break
-//      case "?":
-//        expando = mask.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-//      break
-//      case "-":
-//        expando = mask.replacingOccurrences(of: "-", with: "...")
-//      break
-//    default:
-//      break
-//    }
-    
-    
-    /**
-     while (expando.Contains("-"))
-     {
-         var expandedMask = expando.Substring(0, expando.IndexOf("-") - 1);
-         var post = expando.Substring(expando.IndexOf("-") + 2);
-         var currentCharacter = expando.Substring(expando.IndexOf("-") - 1, 1);
-         var nextCharacter = expando.Substring(expando.IndexOf("-") + 1, 1);
-         expandedMask += BuildRange(currentCharacter, nextCharacter);
-         expandedMask += post;
-         expando = expandedMask;
-     }
-     */
-    
-    return expando
+    expandedCharacters = mask.replacingOccurrences(of: "#", with: "0123456789")
+    expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    expandedCharacters = expandedCharacters.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+    //expando = expando.replacingOccurrences(of: "-", with: "...")
+   
+    return expandedCharacters
   }
   
    func expandRange(first: String, second: String) -> [String] {
@@ -584,7 +369,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
       }
     }
     
-    // 0-C
+    // 0-C - NOT TESTED
     if first.isInteger && !second.isInteger {
       if let a = Int(first){
           let range: Range<String.Index> = alphabet.range(of: second)!
@@ -594,13 +379,14 @@ public class PrefixFileParser: NSObject, ObservableObject {
           let myRange: ClosedRange = 0...index
       
         for item in alphabet[myRange] {
+          expando.append(String(item))
           print (item)
         }
        
       }
     }
     
-    // W-3
+    // W-3 - NOT TESTED
     if !first.isInteger && second.isInteger {
       if let a = Int(second){
           let range: Range<String.Index> = alphabet.range(of: first)!
@@ -610,6 +396,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
           let myRange: ClosedRange = index...25
       
         for item in alphabet[myRange] {
+          expando.append(String(item))
           print (item)
         }
        
@@ -618,24 +405,23 @@ public class PrefixFileParser: NSObject, ObservableObject {
     
     // A-G
     if !first.isInteger && !second.isInteger {
+    
+      let range: Range<String.Index> = alphabet.range(of: first)!
+      let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
       
-         
-          let range: Range<String.Index> = alphabet.range(of: first)!
-          let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
-         
       let range2: Range<String.Index> = alphabet.range(of: second)!
       let index2: Int = alphabet.distance(from: alphabet.startIndex, to: range2.lowerBound)
       
+      let myRange: ClosedRange = index...index2
+     
+      for item in alphabet[myRange] {
+        expando.append(String(item))
+      }
       
-          let myRange: ClosedRange = index...index2
-      
-        for item in alphabet[myRange] {
-          print (item)
-        }
+      // the first character has already been stored
+      expando.remove(at: 0)
     }
-    
-    
-    
+      
     return expando
   }
   

@@ -55,7 +55,7 @@ extension PrefixFileParser: XMLParserDelegate {
     if (!currentValue.isEmpty) {
       switch (nodeName){
       case "mask":
-        prefixData.expandedMaskSetList = expandMask(element: currentValue)
+        prefixData.expandedMaskList = expandMask(element: currentValue)
         //prefixData.storeMask(mask: currentValue )
         //prefixData.rawMasks.append(currentValue )
       case "label":

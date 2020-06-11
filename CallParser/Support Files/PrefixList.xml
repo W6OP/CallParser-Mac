@@ -15,20 +15,6 @@
   </prefix>
   <prefix>
     <masks>
-      <mask>[235-9OX]#</mask>
-      <mask>[JT][019]</mask>
-      <mask>[0Q]?</mask>
-      <mask>KG4@@.</mask>
-      <mask>PU1Z[.Z]</mask>
-      <mask>1[#C-Z]</mask>
-      <mask>4[#N]</mask>
-      <mask>[ACDLPV][01]</mask>
-      <mask>E[0189]</mask>
-      <mask>H[015]</mask>
-      <mask>Z[014579]</mask>
-      <mask>Y[01Z]</mask>
-      <mask>S[14]</mask>
-      <!-- end -->
       <mask>3B6</mask>
       <mask>3B6/</mask>
     </masks>
