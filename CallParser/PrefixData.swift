@@ -39,7 +39,7 @@ public struct PrefixData {
     //var hasChildren = false
     //var children = [PrefixData]()
     // expanded masks
-    var expandedMaskSetList: [Set<String>]
+    var expandedMaskSetList: [String]
     var primaryMaskSets: [[Set<String>]]
     var secondaryMaskSets: [[Set<String>]]
     var rawMasks = [String]()
@@ -69,7 +69,7 @@ public struct PrefixData {
     init () {
         totalAlphaBets = Double(alphabet.count)
         totalNumbers = Double(numbers.count)
-        expandedMaskSetList = [Set<String>]()
+        expandedMaskSetList = [String]()
         primaryMaskSets = [[Set<String>]]()
         secondaryMaskSets = [[Set<String>]]()
     }
@@ -133,7 +133,7 @@ public struct PrefixData {
     
     mutating func expandMaskEx(mask: String) {
         var expandedMask = Set<String>([])
-        expandedMaskSetList = [Set<String>]()
+        expandedMaskSetList = [String]()
         var newMask = mask
         var counter = 0
         
@@ -156,23 +156,23 @@ public struct PrefixData {
                 nextIndex = mask.index(mask.startIndex, offsetBy: counter)
                 newMask = String(mask[nextIndex..<mask.endIndex])
             case "@", "#", "?":
-                expandedMaskSetList.append(getMetaMaskSet(character: String(item)))
+              expandedMaskSetList.append(contentsOf: getMetaMaskSet(character: String(item)))
                 counter += 1
                 let nextIndex = mask.index(mask.startIndex, offsetBy: counter)
                 newMask = String(mask[nextIndex..<mask.endIndex])
             default: // single character
                 //expandedMask = Set<String>([])
                 expandedMask.insert(String(item))
-                expandedMaskSetList.append(expandedMask)
+                expandedMaskSetList.append(contentsOf: expandedMask)
                 counter += 1
                 let nextIndex = mask.index(mask.startIndex, offsetBy: counter)
                 newMask = String(mask[nextIndex..<mask.endIndex])
             }
         }
         
-        primaryMaskSets.append(expandedMaskSetList)
+        //primaryMaskSets.append(expandedMaskSetList)
         // just cosmetic cleanup
-        expandedMaskSetList = [Set<String>]()
+        expandedMaskSetList = [String]()
     }
     
     // have [xxxxxx]
@@ -194,17 +194,17 @@ public struct PrefixData {
      - parameters:
      - mask: mask to be expanded.
      */
-    mutating func expandMask(mask: String) {
+    mutating func expandMaskoo(mask: String) {
         
         var leftOver = ""
         var expandedMask = Set<String>([])
-        expandedMaskSetList = [Set<String>]()
+        expandedMaskSetList = [String]()
         
         // determine if the first character is a "["
         if mask.prefix(1).rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) != nil {
             if mask.prefix(1) == "[" {
                 let newMask = String(mask.suffix(mask.count - 1))
-                expandMask(mask: newMask)
+                expandMaskoo(mask: newMask)
             }
         }
         
@@ -214,7 +214,7 @@ public struct PrefixData {
                 let index = mask.firstIndex(of: "[")!
                 if index == mask.index(mask.startIndex, offsetBy: 1) {
                     expandedMask.insert(String(mask.prefix(1)))
-                    expandedMaskSetList.append(expandedMask)
+                  expandedMaskSetList.append(contentsOf: expandedMask)
                     leftOver = String(mask.suffix(mask.count - 2))
                 }
                 else {
@@ -235,33 +235,6 @@ public struct PrefixData {
             }
         }
     }
-    
-    // R@4[AB]
-    // '[235-9OX]#' becomes
-    // (['2'..'3','5'..'9','O','X'], ['0'..'9'])
-    // (['0','Q'], ['0'..'9','A'..'Z'])
-    // (['1'], ['0'..'9','C'..'Z'])
-    // (['4'], ['0'..'9','N'])
-    // (['A','C'..'D','L','P','V'], ['0'..'1'])
-    // (['E'], ['0'..'1','8'..'9'])
-    // (['H'], ['0'..'1','5'])
-    // (['J','T'], ['0'..'1','9'])
-    // (['Z'], ['0'..'1','4'..'5','7','9'])
-    // (['Y'], ['0'..'1','Z'])
-    // (['S'], ['1','4'])
-    // ------------------
-    // V31/  == (['V'], ['3'], ['1'], ['/']) Old 'V3[/?],V31/'
-    // ------------------
-    // (['Y'], ['A'])
-    // (['T'], ['6'])
-    // (['Y'], ['A'], ['/'])
-    // (['T'], ['6'], ['/'])
-    // ------------------
-    // A[YZ]#[GX]. == (['A'], ['Y'..'Z'], ['0'..'9'], ['G','X'], ['.'])
-    // ------------------
-    // (['O'], ['F'..'I'], ['0'])
-    // (['A','K','W'], ['L'], ['0'..'9'], ['/'])
-    // (['A','K','W'], ['L'], ['/'])
     
     /**
      Split string and eliminate "[" or "]" and empty entries.
@@ -317,10 +290,10 @@ public struct PrefixData {
             parseMask(components: components)
         }
         
-        primaryMaskSets.append(expandedMaskSetList)
+        //primaryMaskSets.append(expandedMaskSetList)
         //print("ex: \(consolidatedMaskSets[maskCount])")
         // just cosmetic cleanup
-        expandedMaskSetList = [Set<String>]()
+        expandedMaskSetList = [String]()
     }
     
     /**
@@ -339,12 +312,12 @@ public struct PrefixData {
         for _ in components {
             // if first is nil, we are finished
             guard components.character(at: counter) != nil else {
-                expandedMaskSetList.append(expandedMask)
+              expandedMaskSetList.append(contentsOf: expandedMask)
                 return
             }
             
             if String(components.character(at: counter) ?? "").isEmpty {
-                expandedMaskSetList.append(expandedMask)
+              expandedMaskSetList.append(contentsOf: expandedMask)
                 return
             }
             
@@ -388,7 +361,7 @@ public struct PrefixData {
                 counter += 1
             }
         } // end for
-        expandedMaskSetList.append(expandedMask)
+      expandedMaskSetList.append(contentsOf: expandedMask)
     }
     
     func findIndex(value searchValue: String, in array: [String]) -> Int?
@@ -422,11 +395,11 @@ public struct PrefixData {
             } else {
                 // 31 = V31/
                 expandedMask.insert(currentCharacter)
-                expandedMaskSetList.append(expandedMask)
+              expandedMaskSetList.append(contentsOf: expandedMask)
                 
                 expandedMask = Set<String>([])
                 expandedMask.insert(nextCharacter)
-                expandedMaskSetList.append(expandedMask)
+              expandedMaskSetList.append(contentsOf: expandedMask)
                 expandedMask = Set<String>([])
             }
         }
