@@ -162,16 +162,16 @@ extension Substring {
 // MARK: - PrefixKind Struct ----------------------------------------------------------------------------
 
 enum PrefixKind:  String {
-    case None
-    case DXCC
-    case Province
-    case Station
-    case DelDXCC
-    case OldPrefix
-    case NonDXCC
-    case InvalidPrefix
-    case DelProvince
-    case City
+    case None = "pfNone"
+    case DXCC = "pfDXCC"
+    case Province = "pfProvince"
+    case Station = "pfStation"
+    case DelDXCC = "pfDelDXCC"
+    case OldPrefix = "pfOldPrefix"
+    case NonDXCC = "pfNonDXCC"
+    case InvalidPrefix = "pfInvalidPrefix"
+    case DelProvince = "pfDelProvince"
+    case City = "pfCity"
 }
 
 // MARK: - CallParser Class ----------------------------------------------------------------------------
@@ -182,7 +182,8 @@ public class PrefixFileParser: NSObject, ObservableObject {
     public var prefixList = [PrefixData]()
     public var callSignDictionary = [String: [PrefixData]]()
     public var portablePrefixes = [String: [PrefixData]]()
-    public var childPrefixList = [PrefixData]()
+    public var adifs = [Int: PrefixData]()
+    public var admins  = [String: [PrefixData]]()
     var prefixData = PrefixData()
     
     var recordKey = "prefix"
@@ -402,7 +403,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
           let range: Range<String.Index> = alphabet.range(of: second)!
           let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
          
-          let intArray: [Int] = Array(a...9)
+        let _: [Int] = Array(a...9)
           let myRange: ClosedRange = 0...index
       
         for item in alphabet[myRange] {
@@ -419,7 +420,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
           let range: Range<String.Index> = alphabet.range(of: first)!
           let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
          
-          let intArray: [Int] = Array(0...a)
+        let _: [Int] = Array(0...a)
           let myRange: ClosedRange = index...25
       
         for item in alphabet[myRange] {

@@ -61,7 +61,6 @@ public class CallLookup: ObservableObject{
     
     var hitList: [HitList]!
     var prefixList: [PrefixData]
-    var childPrefixList: [PrefixData]
 
     /**
      Initialization.
@@ -69,9 +68,8 @@ public class CallLookup: ObservableObject{
      - prefixList: The parent prefix list to use for searches.
      - childPrefixList: the child prefix list to use for searches.
      */
-    public init(prefixList: [PrefixData], childPrefixList: [PrefixData]) {
+    public init(prefixList: [PrefixData]) {
         self.prefixList = prefixList
-        self.childPrefixList = childPrefixList
     }
     
     /**
@@ -156,7 +154,8 @@ public class CallLookup: ObservableObject{
                 matches = searchSecondaryPrefixes(callSign: callSign)
                 switch matches.count {
                 case 0:
-                    searchChildren(callSign: callSign)
+                    //searchChildren(callSign: callSign)
+                  break
                 default:
                     processMatches(matches: matches, callSign: callSign)
                 }
@@ -205,25 +204,6 @@ public class CallLookup: ObservableObject{
         }
         
         return matches
-    }
-    
-  
-    /**
-     Look at the mask in every child of every parent
-     - parameters:
-     - callSign: the call sign to search with.
-     */
-    func searchChildren(callSign: String) {
-
-        let callSetList = getCallSetList(callSign: callSign)
-        
-        for child in childPrefixList {
-            for mask in child.primaryMaskSets{
-                if compareMask(mask: mask, callSetList: callSetList) {
-                    populateHitList(prefixData: child, callSign: callSign)
-                }
-            }
-        }
     }
     
     /**

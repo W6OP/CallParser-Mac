@@ -109,52 +109,32 @@ extension PrefixFileParser: XMLParserDelegate {
    */
   public func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
     
-    //        switch (elementName){
-    //        case "mask":
-    //            prefixData.storeMask(mask: currentValue ?? "")
-    //            prefixData.rawMasks.append(currentValue ?? "")
-    //        case "label":
-    //            prefixData.fullPrefix = currentValue ?? ""
-    //            prefixData.setMainPrefix(fullPrefix: currentValue ?? "")
-    //        case "kind":
-    //            prefixData.setDXCC(prefixKind: PrefixKind(rawValue: currentValue ?? PrefixKind.pfNone.rawValue)!)
-    //        case "country":
-    //            prefixData.country  = currentValue ?? ""
-    //        case "province":
-    //            prefixData.province  = currentValue ?? ""
-    //        case "dxcc_entity":
-    //          prefixData.dxcc_entity  = Int(currentValue ?? "0") ?? 0
-    //        case "cq_zone":
-    //          prefixData.cq  = prefixData.buildZoneList(zones: currentValue ?? "0")
-    //        case "itu_zone":
-    //            prefixData.itu  = prefixData.buildZoneList(zones: currentValue ?? "0")
-    //        case "continent":
-    //            prefixData.continent  = currentValue ?? ""
-    //        case "time_zone":
-    //            prefixData.timeZone  = currentValue ?? ""
-    //        case "lat":
-    //            prefixData.latitude  = currentValue ?? ""
-    //        case "long":
-    //            prefixData.longitude  = currentValue ?? ""
-    //        case "city":
-    //            prefixData.city = currentValue ?? ""
-    //        case "wap_entity":
-    //            prefixData.wap = currentValue ?? ""
-    //        case "wae_entity":
-    //            prefixData.wae = Int(currentValue ?? "0") ?? 0
-    //        case "province_id":
-    //            prefixData.admin1 = currentValue ?? ""
-    //        case "start_date":
-    //            prefixData.startDate = currentValue ?? ""
-    //        case "end_date":
-    //            prefixData.endDate = currentValue ?? ""
-    //        default:
-    //            currentValue = nil
-    //        }
-    
-    //currentValue = ""
     
     if elementName == recordKey {
+      
+      if prefixData.kind == PrefixKind.DXCC {
+        let key = Int(prefixData.dxcc_entity)
+        adifs[key] = prefixData
+      }
+      
+      if prefixData.kind == PrefixKind.InvalidPrefix {
+        adifs[0] = prefixData
+      }
+      
+      if prefixData.wae != 0 {
+        adifs[prefixData.wae] = prefixData
+      }
+      
+      if prefixData.kind == PrefixKind.Province && prefixData.admin1 == "" {
+        
+        if var valueExists = admins[prefixData.admin1] {
+          valueExists.append(prefixData)
+        } else {
+          admins[prefixData.admin1] = [PrefixData](arrayLiteral: prefixData)
+        }
+      }
+     
+      // won't be necessary - callSignDictionary supersedes
       prefixList.append(prefixData)
     }
   }
