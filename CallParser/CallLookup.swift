@@ -70,6 +70,11 @@ public class CallLookup: ObservableObject{
      */
     public init(prefixList: [PrefixData]) {
         self.prefixList = prefixList
+      /**
+       CallSignDictionary = prefixFileParser.CallSignDictionary;
+       Adifs = prefixFileParser.Adifs;
+       PortablePrefixes = prefixFileParser.PortablePrefixes;
+       */
     }
     
     /**
@@ -79,7 +84,7 @@ public class CallLookup: ObservableObject{
      */
     public func lookupCall(call: String) throws -> [HitList] {
       
-            self.processCallSign(callSign: call.uppercased())
+            processCallSign(callSign: call.uppercased())
      
             return self.hitList ?? [HitList]()
       
@@ -91,36 +96,28 @@ public class CallLookup: ObservableObject{
      - call: The call sign to be processed.
      */
     func processCallSign(callSign: String) {
-        
-        var prefix = ""
-        var call = callSign
-        
-        let components = callSign.components(separatedBy: "/")
-        
-        switch (components.count) {
-        case 1:
-            collectMatches(callSign: callSign)
-        case 2:
-            let array = [components[0], components[1]]
-            if let min = array.max(by: {$1.count < $0.count}) {
-                prefix = min
-            }
-            
-            if let max = array.max(by: {$1.count > $0.count}) {
-                call = max
-            }
-            // call can be W4/LU2ART or LU2ART/W4
-            call = "\(prefix)/\(call)"
-            collectMatches(callSign: prefix)
-        case 3..<100:
-            // illegal call format
-            // do something - throw
-            assertionFailure("what happened here")
-            break
-        default:
-            // should I do anything here?
-            break
+      
+        var call = ""// = callSign
+      
+      // strip leading or trailing "/"  /W6OP/
+      if callSign.first(where: {$0 == "/"}) != nil {
+        call = String(callSign.suffix(callSign.count - 1))
+      }
+      
+      if callSign.last(where: {$0 == "/"}) != nil {
+        call = String(call.prefix(call.count - 1))
+      }
+      
+      /**
+       callStructure = new CallStructure(callSign, PortablePrefixes);
+
+        if (callStructure.CallStructureType != CallStructureType.Invalid)
+        {
+            CollectMatches(callStructure, callSign);
         }
+       */
+      
+       
     }
     
     /**

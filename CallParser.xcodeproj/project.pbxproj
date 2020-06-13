@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9944C39124951BCB004B8C7F /* CallStructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9944C39024951BCB004B8C7F /* CallStructure.swift */; };
+		9944C39324951E1C004B8C7F /* CallParserCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9944C39224951E1C004B8C7F /* CallParserCommon.swift */; };
 		998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */ = {isa = PBXBuildFile; fileRef = 998A91A6248C10BC004C21E5 /* PrefixList.xml */; };
 		998A91A9248C1179004C21E5 /* PrefixFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91A8248C1179004C21E5 /* PrefixFileParser.swift */; };
 		998A91AB248C11B6004C21E5 /* XmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91AA248C11B6004C21E5 /* XmlParser.swift */; };
@@ -16,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9944C39024951BCB004B8C7F /* CallStructure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallStructure.swift; sourceTree = "<group>"; };
+		9944C39224951E1C004B8C7F /* CallParserCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallParserCommon.swift; sourceTree = "<group>"; };
 		998A91A6248C10BC004C21E5 /* PrefixList.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrefixList.xml; sourceTree = "<group>"; };
 		998A91A8248C1179004C21E5 /* PrefixFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixFileParser.swift; sourceTree = "<group>"; };
 		998A91AA248C11B6004C21E5 /* XmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XmlParser.swift; sourceTree = "<group>"; };
@@ -71,6 +75,8 @@
 				998A91A8248C1179004C21E5 /* PrefixFileParser.swift */,
 				998A91AA248C11B6004C21E5 /* XmlParser.swift */,
 				998A91AC248C11E8004C21E5 /* PrefixData.swift */,
+				9944C39024951BCB004B8C7F /* CallStructure.swift */,
+				9944C39224951E1C004B8C7F /* CallParserCommon.swift */,
 			);
 			path = CallParser;
 			sourceTree = "<group>";
@@ -157,9 +163,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				998A91A9248C1179004C21E5 /* PrefixFileParser.swift in Sources */,
+				9944C39124951BCB004B8C7F /* CallStructure.swift in Sources */,
 				999D871B248C07ED0031B407 /* CallLookup.swift in Sources */,
 				998A91AB248C11B6004C21E5 /* XmlParser.swift in Sources */,
 				998A91AD248C11E8004C21E5 /* PrefixData.swift in Sources */,
+				9944C39324951E1C004B8C7F /* CallParserCommon.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
