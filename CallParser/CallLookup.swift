@@ -59,22 +59,24 @@ public class CallLookup: ObservableObject{
         case R = "Rover"
     }
     
+    
     var hitList: [HitList]!
-    var prefixList: [PrefixData]
+    var adifs: [Int : PrefixData]
+    var prefixList = [PrefixData]()
+    var callSignDictionary: [String: [PrefixData]]
+    var portablePrefixes: [String: [PrefixData]]
 
     /**
      Initialization.
      - parameters:
      - prefixList: The parent prefix list to use for searches.
-     - childPrefixList: the child prefix list to use for searches.
      */
-    public init(prefixList: [PrefixData]) {
-        self.prefixList = prefixList
-      /**
-       CallSignDictionary = prefixFileParser.CallSignDictionary;
-       Adifs = prefixFileParser.Adifs;
-       PortablePrefixes = prefixFileParser.PortablePrefixes;
-       */
+    public init(prefixFileParser: PrefixFileParser) {
+
+       callSignDictionary = prefixFileParser.callSignDictionary;
+       adifs = prefixFileParser.adifs;
+       portablePrefixes = prefixFileParser.portablePrefixes;
+
     }
     
     /**
@@ -108,14 +110,13 @@ public class CallLookup: ObservableObject{
         call = String(call.prefix(call.count - 1))
       }
       
-      /**
-       callStructure = new CallStructure(callSign, PortablePrefixes);
 
-        if (callStructure.CallStructureType != CallStructureType.Invalid)
-        {
-            CollectMatches(callStructure, callSign);
-        }
-       */
+      let callStructure = CallStructure(callSign: callSign, portablePrefixes: portablePrefixes);
+
+        if (callStructure.callStructureType != CallStructureType.Invalid) {
+          collectMatches(callStructure: callStructure, fullCall: callSign);
+       }
+
       
        
     }
@@ -127,40 +128,131 @@ public class CallLookup: ObservableObject{
      - parameters:
      - callSign: The call sign we are working with.
      */
-    func collectMatches(callSign: String) {
+  func collectMatches(callStructure: CallStructure, fullCall: String) {
         
-        var callPart = callSign.prefix(4)
-        var matches = prefixList.filter({ $0.mainPrefix == callPart})
-        
-        switch matches.count {
-        case 1:
-            populateHitList(prefixData: matches[0], callSign: callSign)
+      let callStructureType = callStructure.callStructureType
+    
+    switch (callStructureType) // GT3UCQ/P
+    {
+        case CallStructureType.CallPrefix:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.PrefixCall:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.CallPortablePrefix:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.CallPrefixPortable:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.PrefixCallPortable:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.PrefixCallText:
+          if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
+
+        case CallStructureType.CallDigit:
+            //if checkReplaceCallArea(callStructure: callStructure, fullCall) { return }
+
         default:
-            callPart.removeLast()
-            while matches.count == 0 {
-                matches = prefixList.filter({ $0.mainPrefix == String(callPart)})
-                callPart.removeLast()
-                if callPart.isEmpty {
-                    break
-                }
-            }
-            
-            // no match so search secondary prefixes
-            switch matches.count {
-            case 0:
-                matches = searchSecondaryPrefixes(callSign: callSign)
-                switch matches.count {
-                case 0:
-                    //searchChildren(callSign: callSign)
-                  break
-                default:
-                    processMatches(matches: matches, callSign: callSign)
-                }
-            default:
-                processMatches(matches: matches, callSign: callSign)
-            }
-        }
+            break
     }
+}
+  
+  /**
+   Portable prefixes are prefixes that end with "/"
+   */
+  func checkForPortablePrefix(callStructure: CallStructure, fullCall: String) -> Bool {
+    
+    let prefix = callStructure.prefix + "/"
+    var list = [PrefixData]()
+    var temp = [PrefixData]()
+    var firstLetter = prefix[0]
+    var pattern = callStructure.buildPattern(candidate: prefix)
+    var unique: [PrefixData]
+    
+    if let query = portablePrefixes[pattern] {
+      
+      for prefixData in query {
+        temp.removeAll()
+        if prefixData.indexKey.contains(firstLetter) {
+          if prefixData.portableMaskExists(call: prefix) {
+            temp.append(prefixData)
+          }
+        }
+        
+        if temp.count != 0 {
+          unique = Array(Set(list + temp))
+          //list.UnionWith(temp);
+          break
+        }
+      }
+    }
+    
+    if list.count > 0
+    {
+      buildHit(foundItems: unique, callStructure: callStructure, prefix: prefix, fullCall: fullCall);
+        return true;
+    }
+    
+    return false
+  }
+  
+  func buildHit(foundItems: [PrefixData], callStructure: CallStructure , prefix: String, fullCall: String) {
+    
+  }
+  /**
+   /// <summary>
+          /// Build the hit and add it to the hitlist.
+          /// </summary>
+          /// <param name="foundItems"></param>
+          /// <param name="baseCall"></param>
+          /// <param name="prefix"></param>
+          /// <param name="fullCall"></param>
+          private void BuildHit(HashSet<CallSignInfo> foundItems, CallStructure callStructure, string prefix, string fullCall)
+          {
+              CallSignInfo callSignInfoCopy = new CallSignInfo();
+              List<CallSignInfo> HighestRankList = foundItems.OrderByDescending(x => x.Rank).ThenByDescending(x => x.Kind).ToList();
+              Dictionary<int, int> dxccEntries = new Dictionary<int, int>();
+
+              foreach (CallSignInfo callSignInfo in HighestRankList)
+              {
+                  callSignInfoCopy = callSignInfo.ShallowCopy();
+                  callSignInfo.CallSignFlags = new HashSet<CallSignFlags>();
+                  callSignInfoCopy.CallSign = fullCall;
+                  callSignInfoCopy.BaseCall = callStructure.BaseCall;
+                  callSignInfoCopy.HitPrefix = prefix;
+                  callSignInfoCopy.CallSignFlags.UnionWith(callStructure.CallSignFlags);
+                  HitList.Add(callSignInfoCopy);
+
+                  // add calls to the cache - if the call exists we won't have to redo all the
+                  // processing earlier the next time it comes in
+                  if (IsBatchLookup)
+                  {
+                      if (!HitCache.ContainsKey(callSignInfoCopy.CallSign))
+                      {
+                          HitCache.TryAdd(callSignInfoCopy.CallSign, callSignInfoCopy);
+                      }
+                  }
+
+                  if (!UseQRZLookup)
+                  {
+                      continue;
+                  }
+
+                  if (QRZLookup.QRZLogon(QRZUserId, QRZPassword))
+                  {
+                      XDocument xDocument = QRZLookup.QRZRequest(callStructure.BaseCall);
+                      if (xDocument != null)
+                      {
+                          CallSignInfo callSignInfoQRZ = new CallSignInfo(xDocument);
+                          HitList.Add(callSignInfoQRZ);
+                      }
+                  }
+              }
+          }
+   */
     
     /**
      Search through the secondary prefixes.
@@ -304,6 +396,112 @@ public class CallLookup: ObservableObject{
         
         return callSetList
     }
+  
+  /**
+   /// <summary>
+          /// Check if the call area needs to be replaced and do so if necessary.
+          /// If the original call gets a hit, find the MainPrefix and replace
+          /// the call area with the new call area. Then do a search with that.
+          /// </summary>
+          /// <param name="callStructure"></param>
+          /// <param name="fullCall"></param>
+          private bool CheckReplaceCallArea(CallStructure callStructure, string fullCall)
+          {
+              // UY0KM/0
+              if (callStructure.Prefix != callStructure.BaseCall.FirstOrDefault(c => char.IsDigit(c)).ToString())
+              {
+                  try
+                  {
+                      if (SearchMainDictionary(callStructure, fullCall, false, out string mainPrefix))
+                      {
+                          var oldDigit = callStructure.Prefix;
+                          callStructure.Prefix = ReplaceCallArea(mainPrefix, callStructure.Prefix, out int position);
+                          switch (callStructure.Prefix)
+                          {
+                              case "":
+                                  // M0CCA/6 - main prefix is "G", F8ATS/9 - Should I replace the digit?
+                                  callStructure.CallStructureType = CallStructureType.Call;
+                                  break;
+                              default:
+                                  // replace the digit in case we don't find it by it's main prefix
+                                  callStructure.BaseCall = callStructure.BaseCall.Remove(position - 1, 1).Insert(position - 1, oldDigit);
+                                  callStructure.CallStructureType = CallStructureType.PrefixCall;
+                                  break;
+                          }
+
+                          CollectMatches(callStructure, fullCall);
+                          return true;
+                      }
+                  }
+                  catch (Exception ex)
+                  {
+                      var a = 1;
+                  }
+              }
+
+              return false;
+          }
+
+          /// <summary>
+          /// Replace the call area with the prefix digit.
+          /// </summary>
+          /// <param name="mainPrefix"></param>
+          /// <param name="callArea"></param>
+          /// <returns></returns>
+          private string ReplaceCallArea(string mainPrefix, string callArea, out int position)
+          {
+              char[] OneCharPrefs = new char[] { 'I', 'K', 'N', 'W', 'R', 'U' };
+              char[] XNUM_SET = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '#', '[' };
+
+              int p = 0;
+
+              switch (mainPrefix.Length)
+              {
+                  case 1:
+                      if (OneCharPrefs.Contains(mainPrefix.First()))
+                      {
+                          p = 2;
+                      }
+                      else if (mainPrefix.All(char.IsLetter))
+                      {
+                          position = 99;
+                          return "";
+                      }
+                      break;
+                  case 2:
+                      if (OneCharPrefs.Contains(mainPrefix.First()) && XNUM_SET.Contains(mainPrefix.Skip(1).First()))
+                      {
+                          p = 2;
+                      }
+                      else
+                      {
+                          p = 3;
+                      }
+                      break;
+                  default:
+                      if (OneCharPrefs.Contains(mainPrefix.First()) && XNUM_SET.Contains(mainPrefix.Skip(1).Take(1).First()))
+                      {
+                          p = 2;
+                      }
+                      else
+                      {
+                          if (XNUM_SET.Contains(mainPrefix.Skip(2).Take(1).First()))
+                          {
+                              p = 3;
+                          }
+                          else
+                          {
+                              p = 4;
+                          }
+                      }
+                      break;
+              }
+
+              position = p;
+
+              return $"{mainPrefix.Substring(0, p - 1)}{callArea}";
+          }
+   */
     
     
 } // end struct

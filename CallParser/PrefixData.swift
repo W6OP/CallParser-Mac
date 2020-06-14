@@ -8,7 +8,7 @@
 
 import Foundation
 
-public struct PrefixData {
+public struct PrefixData: Hashable {
     
     enum CharacterType: String {
         case numeric = "#"
@@ -19,6 +19,9 @@ public struct PrefixData {
         case slash = "/"
         case empty = ""
     }
+  
+    public var indexKey = Set<Character>()
+    public var maskList = [[String]]()
     
     var mainPrefix = ""             //label ie: 3B6
     var fullPrefix = ""             // ie: 3B6.3B7
@@ -114,6 +117,76 @@ public struct PrefixData {
     
     return Set(zoneArrayString.map { Int($0)! })
   }
+  
+  /**
+   Check if a portable mask exists.
+   */
+  public func portableMaskExists(call: String) -> Bool {
+    
+    let first = call[0]
+    let second = call[1]
+    var third: String
+    var fourth: String
+    var fifth: String
+    var sixth: String
+    
+    
+    for item in maskList where item.count == call.count {
+      
+      // can I compare this with call???
+      let joined = item.joined()
+      if joined == call {
+        return true
+      }
+      
+      switch call.count {
+        
+      case 2:
+          if item[0] == String(first) && item[1] == String(second) {
+              return true
+          }
+        
+      case 3:
+        third = String(call[2])
+        if item[0] == String(first) && item[1] == String(second) && item[2] == String(third){
+            return true
+        }
+        
+        case 4:
+        third = String(call[2])
+        fourth = String(call[3])
+        if item[0] == String(first) && item[1] == String(second) && item[2] == String(third) && item[3] == String(fourth){
+            return true
+        }
+        
+      case 5:
+        third = String(call[2])
+        fourth = String(call[3])
+        fifth = String(call[4])
+        if item[0] == String(first) && item[1] == String(second) && item[2] == String(third) && item[3] == String(fourth)  && item[4] == String(fifth){
+            return true
+        }
+        
+        case 6:
+        third = String(call[2])
+        fourth = String(call[3])
+        fifth = String(call[4])
+        sixth = String(call[5])
+        if item[0] == String(first) && item[1] == String(second) && item[2] == String(third) && item[3] == String(fourth)  && item[4] == String(fifth) && item[5] == String(sixth){
+            return true
+        }
+      
+      default:
+        break
+      }
+    }
+    
+    return false
+  }
+  /**
+   
+
+   */
   
     // MARK: Utility Functions ----------------------------------------------------
     

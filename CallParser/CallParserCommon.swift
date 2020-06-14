@@ -43,7 +43,7 @@ enum CallSignFlags:  String {
 /**
  ValidStructures = ':C:C#:C#M:C#T:CM:CM#:CMM:CMP:CMT:CP:CPM:CT:PC:PCM:PCT:';
  */
-enum CallStructureType: String {
+public enum CallStructureType: String {
   case Call = "C"
   case CallDigit = "C#"
   case CallDigitPortable = "C#M"
@@ -221,6 +221,8 @@ extension StringProtocol where Index == String.Index {
 //        }
 //        return result
 //    }
+  
+  // get substrings using a subscript or range
   // https://stackoverflow.com/questions/30018006/understanding-the-removerange-documentation
   subscript(_ offset: Int) -> Element { self[index(startIndex, offsetBy: offset)] }
   subscript(_ range: Range<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
