@@ -29,7 +29,7 @@ public struct HitList {
         self.country = prefixData.country
         self.province = prefixData.province
         self.city = prefixData.city
-        self.dxcc_entity = prefixData.dxcc_entity
+        self.dxcc_entity = prefixData.dxcc
         self.cq = prefixData.cq
         self.itu = prefixData.itu
         self.continent = prefixData.continent
@@ -154,7 +154,7 @@ public class CallLookup: ObservableObject{
 
         case CallStructureType.CallDigit:
             //if checkReplaceCallArea(callStructure: callStructure, fullCall) { return }
-
+        break
         default:
             break
     }
@@ -168,9 +168,8 @@ public class CallLookup: ObservableObject{
     let prefix = callStructure.prefix + "/"
     var list = [PrefixData]()
     var temp = [PrefixData]()
-    var firstLetter = prefix[0]
-    var pattern = callStructure.buildPattern(candidate: prefix)
-    var unique: [PrefixData]
+    let firstLetter = prefix[0]
+    let pattern = callStructure.buildPattern(candidate: prefix)
     
     if let query = portablePrefixes[pattern] {
       
@@ -183,7 +182,7 @@ public class CallLookup: ObservableObject{
         }
         
         if temp.count != 0 {
-          unique = Array(Set(list + temp))
+          list = Array(Set(list + temp))
           //list.UnionWith(temp);
           break
         }
@@ -192,7 +191,7 @@ public class CallLookup: ObservableObject{
     
     if list.count > 0
     {
-      buildHit(foundItems: unique, callStructure: callStructure, prefix: prefix, fullCall: fullCall);
+      buildHit(foundItems: list, callStructure: callStructure, prefix: prefix, fullCall: fullCall);
         return true;
     }
     
@@ -260,40 +259,40 @@ public class CallLookup: ObservableObject{
      - callSign: The call sign we are working with.
      - numberPart: The number in the call.
      */
-    func searchSecondaryPrefixes(callSign: String) -> [PrefixData] {
-        
-        var maxCount = 0
-        var match = false
-        var matches = [PrefixData]()
-        
-        let callSetList = getCallSetList(callSign: callSign)
-
-        for prefixData in prefixList {
-            if prefixData.primaryMaskSets.count > 1 {
-                for primaryMask in prefixData.primaryMaskSets {
-                    let array = [primaryMask, callSetList]
-                    if let min = array.max(by: {$1.count < $0.count}) {
-                        maxCount = min.count
-                    }
-                    
-                    for i in 0..<maxCount {
-                        if callSetList[i].intersection(primaryMask[i]).count != 0 {
-                            match = true
-                        } else {
-                            match = false
-                            break
-                        }
-                    }
-                    
-                    if match == true {
-                        matches.insert(prefixData, at: 0)
-                    }
-                }
-            }
-        }
-        
-        return matches
-    }
+//    func searchSecondaryPrefixes(callSign: String) -> [PrefixData] {
+//        
+//        var maxCount = 0
+//        var match = false
+//        var matches = [PrefixData]()
+//        
+//        let callSetList = getCallSetList(callSign: callSign)
+//
+//        for prefixData in prefixList {
+//            if prefixData.primaryMaskSets.count > 1 {
+//                for primaryMask in prefixData.primaryMaskSets {
+//                    let array = [primaryMask, callSetList]
+//                    if let min = array.max(by: {$1.count < $0.count}) {
+//                        maxCount = min.count
+//                    }
+//                    
+//                    for i in 0..<maxCount {
+//                        if callSetList[i].intersection(primaryMask[i]).count != 0 {
+//                            match = true
+//                        } else {
+//                            match = false
+//                            break
+//                        }
+//                    }
+//                    
+//                    if match == true {
+//                        matches.insert(prefixData, at: 0)
+//                    }
+//                }
+//            }
+//        }
+//        
+//        return matches
+//    }
     
     /**
      With one or matches look for children and see if we can narrow

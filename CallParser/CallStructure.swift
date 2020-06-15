@@ -533,21 +533,36 @@ public class CallStructure {
     return ComponentType.Text;
   }
   
+  
   /**
    Build a pattern that models the string passed in.
+   This is essentialy a duplicate of one in PrefixFileParser
+   TODO: Reconcile the two
    */
   func buildPattern(candidate: String) -> String {
-    
+
     var pattern = ""
-    
-    for item in candidate {
-      if item.isLetter {
+
+    if candidate.allSatisfy({String($0).isInteger}){
+      pattern += "#"
+    } else if candidate.allSatisfy({!String($0).isInteger}){
+      switch candidate[0] {
+      case "/":
+        pattern += "/"
+      case ".":
+        pattern += "."
+      default:
         pattern += "@"
       }
-      
-      if String(item).isInteger {
-        pattern += "#"
-      }
+    } else { // "?"
+      pattern += "?"
+    }
+    
+    if pattern.contains("?") {
+      // # @  - only one (invalid prefix) has two ?  -- @# @@
+      var tempPattern = pattern.replacingOccurrences(of: "?", with: "#")
+      tempPattern = pattern.replacingOccurrences(of: "?", with: "@")
+      return tempPattern
     }
     
     return pattern

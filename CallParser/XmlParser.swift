@@ -44,32 +44,35 @@ extension PrefixFileParser: XMLParserDelegate {
   }
   
   /**
-   Getting the value of each element
+   Getting the value of each element. This differs from the C# version
+   as I pass in the entire prefix node to the CallSignInfo (PrefixData)
+   class and let it parse it. I can't do that easily in Swift.
    - parameters:
    -
    */
   public func parser(_ parser: XMLParser, foundCharacters string: String) {
    
     let currentValue = string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+    var expandedMaskList: [[String]]
     
     if (!currentValue.isEmpty) {
       switch (nodeName){
       case "mask":
-        prefixData.expandedMaskList = expandMask(element: currentValue)
-        buildPattern(primaryMaskList: prefixData.expandedMaskList)
+        expandedMaskList = expandMask(element: currentValue)
+        buildPattern(primaryMaskList: expandedMaskList)
         //prefixData.storeMask(mask: currentValue )
         //prefixData.rawMasks.append(currentValue )
       case "label":
         prefixData.fullPrefix = currentValue
         prefixData.setMainPrefix(fullPrefix: currentValue )
       case "kind":
-        prefixData.setDXCC(prefixKind: PrefixKind(rawValue: currentValue )!)
+        prefixData.setPrefixKind(prefixKind: PrefixKind(rawValue: currentValue )!)
       case "country":
         prefixData.country  = currentValue
       case "province":
         prefixData.province  = currentValue
       case "dxcc_entity":
-        prefixData.dxcc_entity  = Int(currentValue ) ?? 0
+        prefixData.dxcc  = Int(currentValue ) ?? 0
       case "cq_zone":
         prefixData.cq  = prefixData.buildZoneList(zones: currentValue )
       case "itu_zone":
@@ -113,7 +116,7 @@ extension PrefixFileParser: XMLParserDelegate {
     if elementName == recordKey {
       
       if prefixData.kind == PrefixKind.DXCC {
-        let key = Int(prefixData.dxcc_entity)
+        let key = Int(prefixData.dxcc)
         adifs[key] = prefixData
       }
       

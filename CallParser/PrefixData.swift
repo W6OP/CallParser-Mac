@@ -22,6 +22,12 @@ public struct PrefixData: Hashable {
   
     public var indexKey = Set<Character>()
     public var maskList = [[String]]()
+    //var expandedMaskList: [[String]]
+    public var rank = 0
+  
+    //var primaryMaskSets: [[Set<String>]]
+    var rawMasks = [String]()
+    
     
     var mainPrefix = ""             //label ie: 3B6
     var fullPrefix = ""             // ie: 3B6.3B7
@@ -29,7 +35,7 @@ public struct PrefixData: Hashable {
     var country = ""                //country
     var province = ""               //province
     var city = ""                    //city
-    var dxcc_entity = 0              //dxcc_entity
+    var dxcc = 0              //dxcc_entity
     var cq = Set<Int>()           //cq_zone
     var itu = Set<Int>()                    //itu_zone
     var continent = ""              //continent
@@ -37,17 +43,12 @@ public struct PrefixData: Hashable {
     var latitude = "0.0"            //lat
     var longitude = "0.0"           //long
     
-    //var isParent = false
-    //var hasChildren = false
-    //var children = [PrefixData]()
-    // expanded masks
-    var expandedMaskList: [[String]]
-    var primaryMaskSets: [[Set<String>]]
-    var secondaryMaskSets: [[Set<String>]]
-    var rawMasks = [String]()
+  var callSignFlags: [CallSignFlags]
+  
+   
     
     
-    var adif = false
+    //var adif = false
     var wae = 0
     var wap = ""
     var admin1 = ""
@@ -61,20 +62,211 @@ public struct PrefixData: Hashable {
     // for debugging
     var maskCount = 0
     
-    let totalAlphaBets: Double
-    let totalNumbers: Double
-    var counter = 0.0
-    
     let alphabet: [Character] = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
     let numbers: [Character] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     
     init () {
-        totalAlphaBets = Double(alphabet.count)
-        totalNumbers = Double(numbers.count)
-        expandedMaskList = [[String]]()
-        primaryMaskSets = [[Set<String>]]()
-        secondaryMaskSets = [[Set<String>]]()
+        //expandedMaskList = [[String]]()
+        //primaryMaskSets = [[Set<String>]]()
+        callSignFlags = [CallSignFlags]()
     }
+  
+  /**
+   
+   */
+  func getMaskList(first: String, second: String, stopFound: Bool) -> [[String]] {
+    
+    var temp = [[String]]()
+    
+    for item in maskList {
+      if stopFound {
+        if item[0].contains(first) && item[1].contains(second) && ((item.last?.contains(".")) != nil) {
+          temp.append(item)
+        }
+      } else {
+        if item[0].contains(first) && item[1].contains(second) && ((item.last?.contains(".")) == nil) {
+          temp.append(item)
+        }
+      }
+    }
+    
+    return temp
+  }
+  
+  /**
+   
+   */
+  func maskExists(call: String, length: Int) -> Bool {
+    
+    let subCall = call[0...length]
+    let first = subCall[0]
+    let second = subCall[1]
+    var third: String
+    var fourth: String
+    var fifth: String
+    var sixth: String
+    var seventh: String
+    
+    for item in maskList {
+      
+      let searchLength = min(length, item.count)
+      
+      switch searchLength {
+      case 2:
+        if item[0].contains(first) && item[1].contains(second) {
+          //if (item.Last()[0] != "/") C#
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      case 3:
+        third = String(subCall[2])
+        if item[0].contains(first) && item[1].contains(second) && item[2].contains(third) {
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      case 4:
+        third = String(subCall[2])
+        fourth = String(subCall[3])
+        if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth) {
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      case 5:
+        third = String(subCall[2])
+        fourth = String(subCall[3])
+        fifth = String(subCall[4])
+        if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth) {
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      case 6:
+        third = String(subCall[2])
+        fourth = String(subCall[3])
+        fifth = String(subCall[4])
+        sixth = String(subCall[5])
+        if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) {
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      case 7:
+        third = String(subCall[2])
+        fourth = String(subCall[3])
+        fifth = String(subCall[4])
+        sixth = String(subCall[5])
+        seventh = String(subCall[6])
+        if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) && item[6].contains(seventh) {
+          if item[item.count - 1].first == "/" {
+            return true
+          }
+        }
+        
+      default:
+        break
+      }
+      
+    }
+    
+    return false
+  }
+  
+  /**
+   Check if a portable mask exists.
+   */
+  func portableMaskExist(call: String) -> Bool {
+    
+    let count = call.count
+    let first = call[0]
+    let second = call[1]
+    var third: String
+    var fourth: String
+    var fifth: String
+    var sixth: String
+    
+    // item is [String] - maskList is [[String]]
+    for item in maskList { //}(where: {$0.count == call.count}) {
+      if item.count == count {
+        
+        switch count {
+        case 2:
+          if item[0].contains(first) && item[1].contains(second) {return true}
+          
+        case 3:
+          third = String(call[2])
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third) {return true}
+          
+        case 4:
+          third = String(call[2])
+          fourth = String(call[3])
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth) {return true}
+          
+        case 5:
+          third = String(call[2])
+          fourth = String(call[3])
+          fifth = String(call[4])
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth) {return true}
+          
+        case 6:
+          third = String(call[2])
+          fourth = String(call[3])
+          fifth = String(call[4])
+          sixth = String(call[5])
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) {return true}
+          
+        default:
+          break
+        }
+        
+      }
+    }
+    
+    return false
+  }
+  
+  /**
+   The index key is a character that can be the first letter of a call.
+   This way I can search faster.
+   */
+  mutating func setPrimaryMaskList(value: [String]) {
+    
+    // TODO: Masklist should be [[[String]]]
+    
+    
+    
+    maskList.append(value)
+    
+    
+  }
+  /**
+   /// <summary>
+          /// The index key is a character that can be the first letter of a call.
+          /// This way I can search faster.
+          /// </summary>
+          /// <param name="value"></param>
+          internal void SetPrimaryMaskList(List<string[]> value)
+          {
+              maskList.Add(value);
+
+              foreach (var first in value[0])
+              {
+                  if (!IndexKey.ContainsKey(first))
+                  {
+                      IndexKey.Add(first, new byte() { });
+                  }
+              }
+          }
+*/
+  
+  
     
     /**
      Parse the FullPrefix to get the MainPrefix
@@ -94,15 +286,13 @@ public struct PrefixData: Hashable {
      - parameters:
      - prefixKind: PrefixKind
      */
-    mutating func setDXCC(prefixKind: PrefixKind) {
+    mutating func setPrefixKind(prefixKind: PrefixKind) {
        
         self.kind = prefixKind
         
         if prefixKind == PrefixKind.DXCC {
-            adif = true
-            //isParent = true
-        } else {
-            
+            //adif = true
+            province = ""
         }
     }
   
