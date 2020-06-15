@@ -21,7 +21,8 @@ extension PrefixFileParser: XMLParserDelegate {
   public func parserDidStartDocument(_ parser: XMLParser) {
     
     // array of array of prefixData (CallSignInfo)
-    prefixList = [PrefixData]()
+    //prefixList = [PrefixData]()
+    
   }
   
   /**
@@ -37,6 +38,7 @@ extension PrefixFileParser: XMLParserDelegate {
     
     if elementName == recordKey {
       prefixData = PrefixData()
+      tempMaskList = [String]()
     } else if elementName == "Error" {
       print(elementName)
     }
@@ -53,15 +55,15 @@ extension PrefixFileParser: XMLParserDelegate {
   public func parser(_ parser: XMLParser, foundCharacters string: String) {
    
     let currentValue = string.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-    var expandedMaskList: [[String]]
     
     if (!currentValue.isEmpty) {
       switch (nodeName){
       case "mask":
-        expandedMaskList = expandMask(element: currentValue)
-        buildPattern(primaryMaskList: expandedMaskList)
-        //prefixData.storeMask(mask: currentValue )
-        //prefixData.rawMasks.append(currentValue )
+        print("Add")
+        prefixData.tempMaskList.append(currentValue)
+//        expandedMaskList = expandMask(element: currentValue)
+//        prefixData.setPrimaryMaskList(value: expandedMaskList)
+//        buildPattern(primaryMaskList: expandedMaskList)
       case "label":
         prefixData.fullPrefix = currentValue
         prefixData.setMainPrefix(fullPrefix: currentValue )
@@ -111,8 +113,7 @@ extension PrefixFileParser: XMLParserDelegate {
    -
    */
   public func parser(_ parser: XMLParser, didEndElement elementName: String, namespaceURI: String?, qualifiedName qName: String?) {
-    
-    
+   
     if elementName == recordKey {
       
       if prefixData.kind == PrefixKind.DXCC {
@@ -136,9 +137,12 @@ extension PrefixFileParser: XMLParserDelegate {
           admins[prefixData.admin1] = [PrefixData](arrayLiteral: prefixData)
         }
       }
-     
-      // won't be necessary - callSignDictionary supersedes
-      prefixList.append(prefixData)
+      for currentValue in prefixData.tempMaskList {
+        let expandedMaskList = expandMask(element: currentValue)
+        prefixData.setPrimaryMaskList(value: expandedMaskList)
+        buildPattern(primaryMaskList: expandedMaskList)
+      }
+      
     }
   }
   

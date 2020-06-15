@@ -36,8 +36,11 @@ func UI(_ block: @escaping ()->Void) {
 @available(OSX 10.14, *)
 public class PrefixFileParser: NSObject, ObservableObject {
     
-    public var prefixList = [PrefixData]()
+   var tempMaskList = [String]()
+    //public var prefixList = [PrefixData]()
+    // pattern is key
     public var callSignDictionary = [String: [PrefixData]]()
+    // pattern is key
     public var portablePrefixes = [String: [PrefixData]]()
     public var adifs = [Int: PrefixData]()
     public var admins  = [String: [PrefixData]]()
