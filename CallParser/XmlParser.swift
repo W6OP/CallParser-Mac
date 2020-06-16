@@ -59,8 +59,7 @@ extension PrefixFileParser: XMLParserDelegate {
     if (!currentValue.isEmpty) {
       switch (nodeName){
       case "mask":
-        print("Add")
-        prefixData.tempMaskList.append(currentValue)
+          prefixData.tempMaskList.append(currentValue)
 //        expandedMaskList = expandMask(element: currentValue)
 //        prefixData.setPrimaryMaskList(value: expandedMaskList)
 //        buildPattern(primaryMaskList: expandedMaskList)
@@ -153,6 +152,11 @@ extension PrefixFileParser: XMLParserDelegate {
    */
   public func parserDidEndDocument(_ parser: XMLParser) {
     print("document finished")
+    print("CallSignDictionary Count: \(callSignDictionary.count)")
+    print("PortablePrefixes Count: \(portablePrefixes.count)")
+    for (key, value) in callSignDictionary {
+      print("\(key) : \(value.count)")
+    }
   }
   
   /**
@@ -166,3 +170,70 @@ extension PrefixFileParser: XMLParserDelegate {
     currentValue = ""
   }
 }
+/**
+ Key = #@##, Value = 6 ---------- 6
+ Key = @@#@., Value = 18 -------- 57
+ Key = #@, Value = 61 ----------59                    pattern  String  "@@#@."
+ Key = @@#@#, Value = 39 **************************** @@#@? AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] VK9 Australia external
+ Key = @#@., Value = 5 --------------- 5
+ Key = @@#@@#, Value = 1 **********************
+ Key = #@#@, Value = 45 ------------ 45
+ Key = @##, Value = 85 -------------- 85
+ Key = @@#@@@/@., Value = 1 ---------- 1
+ Key = #@@, Value = 39 ------------- 39
+ Key = #@####@, Value = 3 ------------- 3
+ Key = @@#, Value = 745 -------------- 745
+ Key = @#@@., Value = 111 -------------- 111
+ Key = @@#@@., Value = 18  ------------ 19
+ Key = @@##@@@., Value = 2 -------------2
+ Key = @@#@@@@, Value = 2 -----------2
+ Key = @@#@@@, Value = 24 ------------- 23
+ Key = @##@@, Value = 4 ------------- 4
+ Key = @#@@@@, Value = 5 ------------ 5
+ Key = #@#, Value = 239 ---------- 239
+ Key = @###, Value = 4 ------------ 4
+ Key = @#@@@., Value = 90 -----------90
+ Key = @#, Value = 83 ------------- 81
+ Key = @##@., Value = 1 ----------- 1
+ Key = @@##, Value = 78 ******************************
+ Key = @##@, Value = 55 ------------- 55
+ Key = #@###@, Value = 3 ----------3
+ Key = @@#@@@., Value = 2 *****************************
+ Key = @@, Value = 105  -----------105
+ Key = @@#@@, Value = 117 ---------- 78
+ Key = @#@, Value = 16 ----------- 16
+ Key = @@#@, Value = 551 ------------551
+ Key = #@##@, Value = 3 ------------ 3
+
+ @@##@@@. : 2
+ @##@ : 55
+ @@## : 78
+ @@ : 105
+ @@#@@@ : 23
+ @@#@@@. : 2
+ #@###@ : 3
+ #@# : 239
+ @#@@@. : 90
+ @@# : 745
+ #@##@ : 3
+ @@#@@@@ : 2
+ @@#@. : 57
+ @##@. : 1
+ #@#@ : 45
+ @#@@. : 111
+ @# : 81
+ @@#@ : 551
+ @@#@@ : 78
+ @#@. : 5
+ #@####@ : 3
+ #@@ : 39
+ @## : 85
+ @#@@@@ : 5
+ @### : 4
+ @@#@@. : 19
+ @##@@ : 4
+ #@## : 6
+ @@#@@@/@. : 1
+ #@ : 59
+ @#@ : 16
+ */

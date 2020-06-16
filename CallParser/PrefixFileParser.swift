@@ -128,8 +128,10 @@ public class PrefixFileParser: NSObject, ObservableObject {
   
   /**
    Build the pattern from the mask
+   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ]
+   The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
    */
-  func buildPattern(primaryMaskList: [[String]]) {
+  func buildPatternOld(primaryMaskList: [[String]]) {
     var pattern = ""
     var patternList = [String]()
     
@@ -155,6 +157,65 @@ public class PrefixFileParser: NSObject, ObservableObject {
       patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
       patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
       savePatternList(patternList: patternList)
+      return
+    }
+    
+    patternList.append(pattern)
+    savePatternList(patternList: patternList)
+  }
+  
+  /**
+   Build the pattern from the mask
+   KG4@@.
+   [AKNW]H7K[./]
+   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] @@#@. and @@#@.@ (should this be @@#@@.)
+   The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
+   */
+  func buildPattern(primaryMaskList: [[String]]) {
+    var pattern = ""
+    var patternList = [String]()
+    
+    for maskPart in primaryMaskList {
+      
+      switch true {
+        
+      case maskPart.allSatisfy({$0.isInteger}):
+        pattern += "#"
+        
+      case maskPart.allSatisfy({$0.isAlphabetic}):
+        pattern += "@"
+        
+        case maskPart.allSatisfy({$0.isAlphanumeric()}):
+        pattern += "?"
+        
+      case maskPart[0] == "/":
+        pattern += "/"
+        
+      case maskPart[0] == ".":
+        pattern += "."
+        if maskPart.count > 1 {
+          patternList.append(pattern)
+          patternList.append(pattern.replacingOccurrences(of: ".", with: "@."))
+          savePatternList(patternList: patternList)
+          return
+        }
+        
+      case maskPart[0] == "?":
+        // for debugging
+        print("Hit ? - buildPatternEx")
+        
+      default:
+        // should never default
+        print("hit default - buildPatternEx")
+      }
+    }
+    
+    if pattern.contains("?") {
+      // # @  - only one (invalid prefix) has two ?  -- @# @@
+      patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
+      patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
+      savePatternList(patternList: patternList)
+      return
     }
     
     patternList.append(pattern)
@@ -171,6 +232,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
       case "/":
         if var valueExists = portablePrefixes[pattern] {
           valueExists.append(prefixData)
+          portablePrefixes[pattern] = valueExists
         } else {
           portablePrefixes[pattern] = [PrefixData](arrayLiteral: prefixData)
         }
@@ -178,6 +240,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
         if prefixData.kind != PrefixKind.InvalidPrefix {
           if var valueExists = callSignDictionary[pattern] {
             valueExists.append(prefixData)
+            callSignDictionary[pattern] = valueExists
           } else {
             callSignDictionary[pattern] = [PrefixData](arrayLiteral: prefixData)
           }
@@ -235,7 +298,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
     var expandedCharacters: String
     
     expandedCharacters = mask.replacingOccurrences(of: "#", with: "0123456789")
-    expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: " ")
+    expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     expandedCharacters = expandedCharacters.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
     //expando = expando.replacingOccurrences(of: "-", with: "...")
    
