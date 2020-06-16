@@ -168,7 +168,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
    Build the pattern from the mask
    KG4@@.
    [AKNW]H7K[./]
-   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] @@#@. and @@#@.@ (should this be @@#@@.)
+   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] @@#@. and @@#@@.
    The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
    */
   func buildPattern(primaryMaskList: [[String]]) {
