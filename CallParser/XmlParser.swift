@@ -140,8 +140,17 @@ extension PrefixFileParser: XMLParserDelegate {
         let expandedMaskList = expandMask(element: currentValue)
         prefixData.setPrimaryMaskList(value: expandedMaskList)
         buildPattern(primaryMaskList: expandedMaskList)
+//        if prefixData.country == "Indonesia"{
+//          print(currentValue)
+//          buildPattern(primaryMaskList: expandedMaskList)
+//          for (key, value) in callSignDictionary {
+//            if key == "@@#@." {
+//              print("\(key) : \(value.count)")
+//            }
+//          }
+//        }
+        
       }
-      
     }
   }
   
@@ -152,11 +161,11 @@ extension PrefixFileParser: XMLParserDelegate {
    */
   public func parserDidEndDocument(_ parser: XMLParser) {
     print("document finished")
-    print("CallSignDictionary Count: \(callSignDictionary.count)")
-    print("PortablePrefixes Count: \(portablePrefixes.count)")
-    for (key, value) in callSignDictionary {
-      print("\(key) : \(value.count)")
-    }
+    //print("CallSignDictionary Count: \(callSignDictionary.count)")
+    //print("PortablePrefixes Count: \(portablePrefixes.count)")
+//    for (key, value) in portablePrefixes {
+//      print("\(key) : \(value.count)")
+//    }
   }
   
   /**
@@ -171,21 +180,16 @@ extension PrefixFileParser: XMLParserDelegate {
   }
 }
 /**
- Key = @@#@., Value = 18 ------------ 57
- Key = #@, Value = 61 --------------- 59
- Key = @@#@#, Value = 39
- Key = @@#@@#, Value = 1
- Key = @@#@@., Value = 19 ----------- 59
- Key = @@#@@@, Value = 24 ----------- 23
- Key = @#, Value = 83 --------------- 81
- Key = @@#@@@., Value = 3 ----------- 4
- Key = @@#@@, Value = 117 ------------78
+ TODO:
+ portable prefixes
+ 
+ C#
+ Key = @@#/, Value = 540
 
- @@#@@@ : 23 ---------- 24
- @@#@@. : 59 ---------- 19
- @@#@. : 57 ----------- 18
- #@ : 59 -------------- 61
- @@#@@@. : 4 ---------- 3
- @# : 81 -------------- 83
- @@#@@ : 78 ----------- 117
+ Swift
+ #@@/ : 2
+ @@#/ : 541
+
+ CallSignDictionary
+ slight difference but appear to have to do with invalid prefixes
  */

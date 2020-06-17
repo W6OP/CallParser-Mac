@@ -82,6 +82,20 @@ enum ComponentType {
   case Valid
 }
 
+// EndingPreserve = ':R:P:M:';
+// EndingIgnore = ':AM:MM:QRP:A:B:BCN:LH:';
+enum CallSignType: String {
+    case A = "A"
+    case ADIF = "ADIF"
+    case B = "B"
+    case BCN = "Beacon"
+    case LH = "LH"
+    case M = "Mobile"
+    case MM = "Marine Mobile"
+    case P = "Portable"
+    case QRP = "Low Power"
+    case R = "Rover"
+}
 
 
 // also look at https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
@@ -124,6 +138,27 @@ extension String {
   func isAlphanumeric() -> Bool {
       return self.rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil && self != ""
     }
+  
+  // here to end
+  // https://stackoverflow.com/questions/29971505/filter-non-digits-from-string
+  var onlyDigits: String { return onlyCharacters(charSets: [.decimalDigits]) }
+  var onlyLetters: String { return onlyCharacters(charSets: [.letters]) }
+  
+    private func filterCharacters(unicodeScalarsFilter closure: (UnicodeScalar) -> Bool) -> String {
+          return String(String.UnicodeScalarView(unicodeScalars.filter { closure($0) }))
+      }
+
+      private func filterCharacters(definedIn charSets: [CharacterSet], unicodeScalarsFilter: (CharacterSet, UnicodeScalar) -> Bool) -> String {
+          if charSets.isEmpty { return self }
+          let charSet = charSets.reduce(CharacterSet()) { return $0.union($1) }
+          return filterCharacters { unicodeScalarsFilter(charSet, $0) }
+      }
+
+      func removeCharacters(charSets: [CharacterSet]) -> String { return filterCharacters(definedIn: charSets) { !$0.contains($1) } }
+      func removeCharacters(charSet: CharacterSet) -> String { return removeCharacters(charSets: [charSet]) }
+
+      func onlyCharacters(charSets: [CharacterSet]) -> String { return filterCharacters(definedIn: charSets) { $0.contains($1) } }
+      func onlyCharacters(charSet: CharacterSet) -> String { return onlyCharacters(charSets: [charSet]) }
   }
 
 // if the digit is the next in value 5,6 = true
@@ -135,6 +170,7 @@ extension Int {
         return false
     }
 }
+
 
 // MARK: - String Extension ----------------------------------------------------------------------------
 

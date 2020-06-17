@@ -39,7 +39,8 @@ public class PrefixFileParser: NSObject, ObservableObject {
    var tempMaskList = [String]()
     //public var prefixList = [PrefixData]()
     // pattern is key
-    public var callSignDictionary = [String: [PrefixData]]()
+  // rename to prefixPatterns
+    public var CallSignPatterns = [String: [PrefixData]]()
     // pattern is key
     public var portablePrefixes = [String: [PrefixData]]()
     public var adifs = [Int: PrefixData]()
@@ -225,7 +226,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
   /**
    Build the portablePrefix and callSignDictionaries.
    */
-  func savePatternList(patternList: [String]) {
+  func savePatternList(patternList: [String]) { //"@@#@."
     
     for pattern in patternList {
       switch pattern.suffix(1) {
@@ -238,11 +239,11 @@ public class PrefixFileParser: NSObject, ObservableObject {
         }
       default:
         if prefixData.kind != PrefixKind.InvalidPrefix {
-          if var valueExists = callSignDictionary[pattern] {
+          if var valueExists = CallSignPatterns[pattern] {
             valueExists.append(prefixData)
-            callSignDictionary[pattern] = valueExists
+            CallSignPatterns[pattern] = valueExists
           } else {
-            callSignDictionary[pattern] = [PrefixData](arrayLiteral: prefixData)
+            CallSignPatterns[pattern] = [PrefixData](arrayLiteral: prefixData)
           }
         }
       }

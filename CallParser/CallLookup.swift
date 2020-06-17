@@ -9,7 +9,7 @@
 import Foundation
 import Combine
 
-public struct HitList {
+public struct Hit {
     var call = ""                   //call sign as input
     var kind = PrefixKind.None    //kind
     var country = ""                //country
@@ -44,26 +44,12 @@ public struct HitList {
  */
 public class CallLookup: ObservableObject{
     
-    // EndingPreserve = ':R:P:M:';
-    // EndingIgnore = ':AM:MM:QRP:A:B:BCN:LH:';
-    enum CallSignType: String {
-        case A = "A"
-        case ADIF = "ADIF"
-        case B = "B"
-        case BCN = "Beacon"
-        case LH = "LH"
-        case M = "Mobile"
-        case MM = "Marine Mobile"
-        case P = "Portable"
-        case QRP = "Low Power"
-        case R = "Rover"
-    }
     
     
-    var hitList: [HitList]!
+    var hitList: [Hit]!
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
-    var callSignDictionary: [String: [PrefixData]]
+    var CallSignPatterns: [String: [PrefixData]]
     var portablePrefixes: [String: [PrefixData]]
 
     /**
@@ -73,7 +59,7 @@ public class CallLookup: ObservableObject{
      */
     public init(prefixFileParser: PrefixFileParser) {
 
-       callSignDictionary = prefixFileParser.callSignDictionary;
+       CallSignPatterns = prefixFileParser.CallSignPatterns;
        adifs = prefixFileParser.adifs;
        portablePrefixes = prefixFileParser.portablePrefixes;
 
@@ -84,12 +70,11 @@ public class CallLookup: ObservableObject{
      - parameters:
      - callSign: The call sign we want to process.
      */
-    public func lookupCall(call: String) throws -> [HitList] {
+    public func lookupCall(call: String) throws -> [Hit] {
       
             processCallSign(callSign: call.uppercased())
      
-            return self.hitList ?? [HitList]()
-      
+            return self.hitList ?? [Hit]()
     }
     
     /**
@@ -116,9 +101,6 @@ public class CallLookup: ObservableObject{
         if (callStructure.callStructureType != CallStructureType.Invalid) {
           collectMatches(callStructure: callStructure, fullCall: callSign);
        }
-
-      
-       
     }
     
     /**
@@ -153,12 +135,112 @@ public class CallLookup: ObservableObject{
           if checkForPortablePrefix(callStructure: callStructure, fullCall: fullCall) { return }
 
         case CallStructureType.CallDigit:
-            //if checkReplaceCallArea(callStructure: callStructure, fullCall) { return }
+          if checkReplaceCallArea(callStructure: callStructure, fullCall: fullCall) { return }
         break
         default:
             break
     }
+    
+    /**
+     if SearchMainDictionary(callStructure, fullCall, true, inout _))
+                    {
+                        return;
+                    }
+     */
+    
 }
+  
+  func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool,  mainPrefix: inout String) -> Bool
+  {
+    let baseCall = callStructure.baseCall
+    let prefix = callStructure.prefix
+    var list = Set<PrefixData>()
+    var foundItems =  Set<PrefixData>()
+    var temp =  Set<PrefixData>()
+    var stopFound = false
+    
+    var pattern: String
+    var firstLetter = prefix![0]
+    var nextLetter = Character("")
+    var searchBy = prefix!
+    
+    if prefix!.count > 1 {
+       nextLetter = prefix![1]
+    }
+    
+    switch (true) {
+      
+    case callStructure.callStructureType == CallStructureType.PrefixCall
+      || callStructure.callStructureType == CallStructureType.PrefixCallPortable
+      || callStructure.callStructureType == CallStructureType.PrefixCallText
+      && prefix!.count == 1:
+      
+      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
+      
+    case callStructure.callStructureType == CallStructureType.PrefixCall:
+      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
+      
+    case callStructure.callStructureType == CallStructureType.PrefixCall:
+      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
+      
+    case callStructure.callStructureType == CallStructureType.PrefixCallText:
+      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
+      
+    default:
+      searchBy = baseCall!
+      firstLetter = baseCall![0]
+      nextLetter = baseCall![1]
+      pattern = callStructure.buildPattern(candidate: callStructure.baseCall)
+    }
+    
+    return performSearch(candidate: pattern, firstLetter: firstLetter, searchBy: searchBy)
+  }
+  
+  /**
+   first we look in all the "." patterns for calls like KG4AA vs KG4AAA
+   */
+  func performSearch(candidate: String, firstLetter: Character, searchBy: String) -> Bool {
+    
+    var pattern = candidate + "."
+    var temp = Set<PrefixData>()
+    var list = Set<PrefixData>()
+
+    while (pattern.count > 1)
+    {
+      if let valuesExists = CallSignPatterns[pattern] {
+        for prefixData in valuesExists {
+          temp = Set<PrefixData>()
+          if prefixData.indexKey.contains(firstLetter) {
+            if pattern.last == "." {
+              if prefixData.maskExists(call: searchBy, length: pattern.count - 1) {
+                temp.insert(prefixData)
+                break
+              }
+            } else {
+              if prefixData.maskExists(call: searchBy, length: pattern.count) {
+                temp.insert(prefixData)
+                break
+              }
+            }
+          }
+        }
+      }
+
+      if temp.count != 0 {
+        list = list.union(temp)
+        break
+      }
+
+      pattern.removeLast()
+    }
+    
+    return false
+  }
+  
+  /**
+   // first we look in all the "." patterns for calls like KG4AA vs KG4AAA
+   */
+  
   
   /**
    Portable prefixes are prefixes that end with "/"
@@ -368,10 +450,10 @@ public class CallLookup: ObservableObject{
         func populateHitList(prefixData: PrefixData, callSign: String) {
             
             if hitList == nil {
-                hitList = [HitList]()
+                hitList = [Hit]()
             }
             
-            hitList.append(HitList(callSign: callSign, prefixData: prefixData))
+            hitList.append(Hit(callSign: callSign, prefixData: prefixData))
         }
     
     /**
@@ -396,6 +478,31 @@ public class CallLookup: ObservableObject{
         return callSetList
     }
   
+  /**
+   Check if the call area needs to be replaced and do so if necessary.
+   If the original call gets a hit, find the MainPrefix and replace
+   the call area with the new call area. Then do a search with that.
+   */
+  func checkReplaceCallArea(callStructure: CallStructure, fullCall: String) -> Bool {
+    
+    let digits = callStructure.prefix.onlyDigits
+    var mainPrefix = ""
+    
+    // UY0KM/0
+    if callStructure.prefix == String(digits[0]) {
+      if searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false, mainPrefix: &mainPrefix){
+        
+        
+        
+        
+      }
+    }
+    
+    
+    return false
+  }
+  
+
   /**
    /// <summary>
           /// Check if the call area needs to be replaced and do so if necessary.

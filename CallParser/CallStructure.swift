@@ -14,7 +14,7 @@ public class CallStructure {
   private var singleCharacterPrefixes: [String] = ["F", "G", "M", "I", "R", "W" ]
   
   public var prefix: String!
-  private var baseCall: String!
+  public var baseCall: String!
   private var suffix1: String!
   private var suffix2: String!
   
@@ -277,7 +277,9 @@ public class CallStructure {
     }
   }
   
-  
+  /**
+   
+   */
   func setCallSignFlags(component1: String, component2: String){
     
     switch component1 {
@@ -539,7 +541,7 @@ public class CallStructure {
    This is essentialy a duplicate of one in PrefixFileParser
    TODO: Reconcile the two
    */
-  func buildPattern(candidate: String) -> String {
+  func buildPatternOld(candidate: String) -> String {
 
     var pattern = ""
 
@@ -567,6 +569,40 @@ public class CallStructure {
     
     return pattern
   }
+  
+  /**
+   Build the pattern from the mask
+   KG4@@.
+   [AKNW]H7K[./]
+   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] @@#@. and @@#@@.
+   The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
+   */
+  func buildPattern(candidate: String)-> String {
+    var pattern = ""
+    
+    for item in candidate {
+      switch true {
+        
+      case String(item).isInteger:
+        pattern += "#"
+        
+      case String(item).isAlphabetic:
+        pattern += "@"
+        
+      case item == "/":
+        pattern += "/"
+        
+      case item == ".":
+        pattern += "."
+      
+      default:
+        // should never default
+        print("hit default - buildPattern")
+      }
+    }
+      return pattern
+  }
+
   
   /*
    */
