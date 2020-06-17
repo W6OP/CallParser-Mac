@@ -113,6 +113,7 @@ public class CallLookup: ObservableObject{
   func collectMatches(callStructure: CallStructure, fullCall: String) {
         
       let callStructureType = callStructure.callStructureType
+      var search = (mainPrefix: "", result: false)
     
     switch (callStructureType) // GT3UCQ/P
     {
@@ -150,14 +151,10 @@ public class CallLookup: ObservableObject{
     
 }
   
-  func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool,  mainPrefix: inout String) -> Bool
+  func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
     let baseCall = callStructure.baseCall
     let prefix = callStructure.prefix
-    var list = Set<PrefixData>()
-    var foundItems =  Set<PrefixData>()
-    var temp =  Set<PrefixData>()
-    var stopFound = false
     
     var pattern: String
     var firstLetter = prefix![0]
@@ -193,13 +190,13 @@ public class CallLookup: ObservableObject{
       pattern = callStructure.buildPattern(candidate: callStructure.baseCall)
     }
     
-    return performSearch(candidate: pattern, firstLetter: firstLetter, searchBy: searchBy)
+    return performSearch(candidate: pattern, firstLetter: firstLetter, nextLetter: nextLetter, baseCall: baseCall!, searchBy: searchBy)
   }
   
   /**
    first we look in all the "." patterns for calls like KG4AA vs KG4AAA
    */
-  func performSearch(candidate: String, firstLetter: Character, searchBy: String) -> Bool {
+  func performSearch(candidate: String, firstLetter: Character, nextLetter: Character, baseCall: String, searchBy: String) -> (mainPrefix: String, result: Bool) {
     
     var pattern = candidate + "."
     var temp = Set<PrefixData>()
@@ -234,11 +231,153 @@ public class CallLookup: ObservableObject{
       pattern.removeLast()
     }
     
-    return false
+    return refineHits(list: list, firstLetter: firstLetter, nextLetter: nextLetter, baseCall: baseCall)
   }
   
   /**
-   // first we look in all the "." patterns for calls like KG4AA vs KG4AAA
+   now we have a list of posibilities // HG5ACZ/P
+   */
+  func refineHits(list: Set<PrefixData>, firstLetter: Character, nextLetter: Character, baseCall: String) -> (mainPrefix: String, result: Bool) {
+    
+    var foundItems =  Set<PrefixData>()
+    
+    switch list.count {
+    case 0:
+      return (mainPrefix: "", result: false)
+    case 1:
+      foundItems = list
+    default:
+      for prefixData in list {
+        var rank = 0
+        var previous = true
+        let primaryMaskList = prefixData.getMaskList(first: String(firstLetter), second: String(nextLetter), stopFound: false)
+        
+        for maskList in primaryMaskList {
+          var position = 2
+          previous = true
+          
+          let length = min(maskList.count, baseCall.count)
+          for index in 2...length {
+            let anotherLetter = baseCall[index]
+            if maskList[position].contains(String(anotherLetter)) && previous {
+              rank = position + 1
+            } else {
+              previous = false
+              break
+            }
+            position += 1
+          }
+          
+          if rank == length || maskList.count == 2 {
+            var data = prefixData
+            data.rank = rank
+            foundItems.insert(data)
+          }
+        }
+      }
+    }
+    
+//    if (foundItems.Count > 0)
+//     {
+//         if (!saveHit)
+//         {
+//             mainPrefix = foundItems.First().MainPrefix;
+//             return true;
+//         }
+//         else
+//         {
+//             if (!MergeHits || foundItems.Count == 1)
+//             {
+//                 BuildHit(foundItems, callStructure, baseCall, fullCall);
+//                 mainPrefix = "";
+//             }
+//             else
+//             {
+//                 MergeMultipleHits(foundItems, callStructure, baseCall, fullCall);
+//                 mainPrefix = "";
+//             }
+//
+//             return true;
+//         }
+//     }
+// }
+//
+//               mainPrefix = "";
+//               return false;
+    
+    
+    return (mainPrefix: "", result: false)
+  }
+  
+  /**
+    
+  foreach (CallSignInfo info in list)
+  {
+      var rank = 0;
+      var previous = true;
+      var primaryMaskList = info.GetMaskList(firstLetter, nextLetter, stopFound);
+
+      foreach (List<string[]> maskList in primaryMaskList) // ToList uneccessary here
+      {
+          var position = 2;
+          previous = true;
+
+          // get smaller length
+          var length = baseCall.Length < maskList.Count ? baseCall.Length : maskList.Count;
+
+          for (var i = 2; i < length; i++)
+          {
+              var anotherLetter = baseCall.Substring(i, 1); //.Skip(i).First().ToString();
+
+              if (maskList[position].Contains(anotherLetter) && previous)
+              {
+                  rank = position + 1;
+              }
+              else
+              {
+                  previous = false;
+                  break;
+              }
+              position += 1;
+          }
+
+          // if found with 2 chars
+          if (rank == length || maskList.Count == 2)
+          {
+              info.Rank = rank;
+              foundItems.Add(info);
+          }
+      }
+  }
+                
+
+                  if (foundItems.Count > 0)
+                  {
+                      if (!saveHit)
+                      {
+                          mainPrefix = foundItems.First().MainPrefix;
+                          return true;
+                      }
+                      else
+                      {
+                          if (!MergeHits || foundItems.Count == 1)
+                          {
+                              BuildHit(foundItems, callStructure, baseCall, fullCall);
+                              mainPrefix = "";
+                          }
+                          else
+                          {
+                              MergeMultipleHits(foundItems, callStructure, baseCall, fullCall);
+                              mainPrefix = "";
+                          }
+
+                          return true;
+                      }
+                  }
+              }
+
+              mainPrefix = "";
+              return false;
    */
   
   
@@ -490,12 +629,12 @@ public class CallLookup: ObservableObject{
     
     // UY0KM/0
     if callStructure.prefix == String(digits[0]) {
-      if searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false, mainPrefix: &mainPrefix){
-        
-        
-        
-        
-      }
+//      if searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false, mainPrefix: &mainPrefix){
+//
+//
+//
+//
+//      }
     }
     
     
