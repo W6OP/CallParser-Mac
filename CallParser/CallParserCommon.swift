@@ -10,7 +10,7 @@ import Foundation
 
 // MARK: - PrefixKind Enum ----------------------------------------------------------------------------
 
-enum PrefixKind:  String {
+public enum PrefixKind:  String {
     case None = "pfNone"
     case DXCC = "pfDXCC"
     case Province = "pfProvince"
@@ -25,7 +25,7 @@ enum PrefixKind:  String {
 
 // MARK: - CallSignFlags Enum ----------------------------------------------------------------------------
 
-enum CallSignFlags:  String {
+public enum CallSignFlags:  String {
   case None = "cfNone"
   case Invalid = "cfInvalid"
   case   Maritime = "cfMaritime"
@@ -84,7 +84,7 @@ enum ComponentType {
 
 // EndingPreserve = ':R:P:M:';
 // EndingIgnore = ':AM:MM:QRP:A:B:BCN:LH:';
-enum CallSignType: String {
+public enum CallSignType: String {
     case A = "A"
     case ADIF = "ADIF"
     case B = "B"
@@ -95,6 +95,12 @@ enum CallSignType: String {
     case P = "Portable"
     case QRP = "Low Power"
     case R = "Rover"
+}
+
+enum SearchBy: String {
+  case Prefix
+  case BaseCall
+  case None
 }
 
 

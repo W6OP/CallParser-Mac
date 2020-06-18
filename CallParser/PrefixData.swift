@@ -23,13 +23,8 @@ public struct PrefixData: Hashable {
   public var indexKey = Set<Character>()
   public var maskList = Set<[[String]]>() //maskList = new HashSet<List<string[]>>();
   public var tempMaskList = [String]()
-  //var expandedMaskList: [[String]]
   public var rank = 0
-  
-  //var primaryMaskSets: [[Set<String>]]
-  //var rawMasks = [String]()
-  
-  
+ 
   var mainPrefix = ""             //label ie: 3B6
   var fullPrefix = ""             // ie: 3B6.3B7
   var kind = PrefixKind.None    //kind
@@ -46,8 +41,6 @@ public struct PrefixData: Hashable {
   
   var callSignFlags: [CallSignFlags]
   
-  
-  //var adif = false
   var wae = 0
   var wap = ""
   var admin1 = ""
@@ -65,8 +58,7 @@ public struct PrefixData: Hashable {
   let numbers: [Character] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
   
   init () {
-    //expandedMaskList = [[String]]()
-    //primaryMaskSets = [[Set<String>]]()
+   
     callSignFlags = [CallSignFlags]()
   }
   
@@ -100,6 +92,7 @@ public struct PrefixData: Hashable {
     let subCall = call[0...length]
     let first = String(subCall[0])
     let second = String(subCall[1])
+    let portable = "/"
     var third: String
     var fourth: String
     var fifth: String
@@ -109,22 +102,22 @@ public struct PrefixData: Hashable {
     // maskList = Set<[[String]]>
     // item = [[String]]
     for item in maskList {
-      for mask in item {
+      //for mask in item {
         let searchLength = min(length, item.count)
         
         switch searchLength {
         case 2:
-          if mask[0].contains(first) && mask[1].contains(second) {
+          if item[0].contains(first) && item[1].contains(second) {
             //if (item.Last()[0] != "/") C#
-            if mask[mask.count - 1].first == "/" {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
           
         case 3:
           third = String(subCall[2])
-          if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third) {
-            if mask[mask.count - 1].first == "/" {
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third) {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
@@ -132,8 +125,8 @@ public struct PrefixData: Hashable {
         case 4:
           third = String(subCall[2])
           fourth = String(subCall[3])
-          if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth) {
-            if mask[mask.count - 1].first == "/" {
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth) {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
@@ -142,8 +135,8 @@ public struct PrefixData: Hashable {
           third = String(subCall[2])
           fourth = String(subCall[3])
           fifth = String(subCall[4])
-          if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth)  && mask[4].contains(fifth) {
-            if mask[mask.count - 1].first == "/" {
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth) {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
@@ -153,8 +146,8 @@ public struct PrefixData: Hashable {
           fourth = String(subCall[3])
           fifth = String(subCall[4])
           sixth = String(subCall[5])
-          if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth)  && mask[4].contains(fifth)  && mask[5].contains(sixth) {
-            if mask[mask.count - 1].first == "/" {
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
@@ -165,8 +158,8 @@ public struct PrefixData: Hashable {
           fifth = String(subCall[4])
           sixth = String(subCall[5])
           seventh = String(subCall[6])
-          if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth)  && mask[4].contains(fifth)  && mask[5].contains(sixth) && mask[6].contains(seventh) {
-            if mask[mask.count - 1].first == "/" {
+          if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) && item[6].contains(seventh) {
+            if item[item.count - 1].first != portable {
               return true
             }
           }
@@ -174,7 +167,7 @@ public struct PrefixData: Hashable {
         default:
           break
         }
-      }
+      //}
     }
     
     return false

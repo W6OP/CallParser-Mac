@@ -10,32 +10,53 @@ import Foundation
 import Combine
 
 public struct Hit {
-    var call = ""                   //call sign as input
-    var kind = PrefixKind.None    //kind
-    var country = ""                //country
-    var province = ""               //province
-    var city = ""                   //city
-    var dxcc_entity = 0            //dxcc_entity
-    var cq = Set<Int>()                    //cq_zone
-    var itu = Set<Int>()                   //itu_zone
-    var continent = ""              //continent
-    var timeZone = ""               //time_zone
-    var latitude = "0.0"            //lat
-    var longitude = "0.0"           //long
+    public var call = ""                   //call sign as input
+    public var kind = PrefixKind.None    //kind
+    public var country = ""                //country
+    public var province = ""               //province
+    public var city = ""                   //city
+    public var dxcc_entity = 0            //dxcc_entity
+    public var cq = Set<Int>()                    //cq_zone
+    public var itu = Set<Int>()                   //itu_zone
+    public var continent = ""              //continent
+    public var timeZone = ""               //time_zone
+    public var latitude = "0.0"            //lat
+    public var longitude = "0.0"           //long
+    public var wae = 0
+    public var wap = ""
+    public var admin1 = ""
+    public var admin2 = ""
+    public var startDate = ""
+    public var endDate = ""
+    public var isIota = false // implement
+    public var comment = ""
+  
+    public var callSignFlags: [CallSignFlags]
     
     init(callSign: String, prefixData: PrefixData) {
-        self.call = callSign
-        self.kind = prefixData.kind
-        self.country = prefixData.country
-        self.province = prefixData.province
-        self.city = prefixData.city
-        self.dxcc_entity = prefixData.dxcc
-        self.cq = prefixData.cq
-        self.itu = prefixData.itu
-        self.continent = prefixData.continent
-        self.timeZone = prefixData.timeZone
-        self.latitude = prefixData.latitude
-        self.longitude = prefixData.longitude
+        call = callSign
+        kind = prefixData.kind
+        country = prefixData.country
+        province = prefixData.province
+        city = prefixData.city
+        dxcc_entity = prefixData.dxcc
+        cq = prefixData.cq
+        itu = prefixData.itu
+        continent = prefixData.continent
+        timeZone = prefixData.timeZone
+        latitude = prefixData.latitude
+        longitude = prefixData.longitude
+        wae = prefixData.wae
+        wap = prefixData.wap
+        admin1 = prefixData.admin1
+        admin2 = prefixData.admin2
+        startDate = prefixData.startDate
+        endDate = prefixData.endDate
+        isIota = prefixData.isIota
+        comment = prefixData.comment
+      
+      callSignFlags = prefixData.callSignFlags
+      
     }
 }
 
@@ -72,6 +93,7 @@ public class CallLookup: ObservableObject{
      */
     public func lookupCall(call: String) throws -> [Hit] {
       
+            hitList = [Hit]()
             processCallSign(callSign: call.uppercased())
      
             return self.hitList ?? [Hit]()
@@ -113,7 +135,6 @@ public class CallLookup: ObservableObject{
   func collectMatches(callStructure: CallStructure, fullCall: String) {
         
       let callStructureType = callStructure.callStructureType
-      var search = (mainPrefix: "", result: false)
     
     switch (callStructureType) // GT3UCQ/P
     {
@@ -142,28 +163,19 @@ public class CallLookup: ObservableObject{
             break
     }
     
-    /**
-     if SearchMainDictionary(callStructure, fullCall, true, inout _))
-                    {
-                        return;
-                    }
-     */
-    
+    if searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: true).result == true
+    {
+        return;
+    }
 }
   
   func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
-    let baseCall = callStructure.baseCall
+    _ = callStructure.baseCall
     let prefix = callStructure.prefix
     
     var pattern: String
-    var firstLetter = prefix![0]
-    var nextLetter = Character("")
-    var searchBy = prefix!
-    
-    if prefix!.count > 1 {
-       nextLetter = prefix![1]
-    }
+    var searchBy = SearchBy.Prefix
     
     switch (true) {
       
@@ -184,37 +196,53 @@ public class CallLookup: ObservableObject{
       pattern = callStructure.buildPattern(candidate: callStructure.prefix)
       
     default:
-      searchBy = baseCall!
-      firstLetter = baseCall![0]
-      nextLetter = baseCall![1]
+      searchBy = SearchBy.BaseCall
       pattern = callStructure.buildPattern(candidate: callStructure.baseCall)
     }
     
-    return performSearch(candidate: pattern, firstLetter: firstLetter, nextLetter: nextLetter, baseCall: baseCall!, searchBy: searchBy)
+    return performSearch(candidate: pattern, callStructure: callStructure, searchBy: searchBy, saveHit: saveHit)
   }
   
   /**
-   first we look in all the "." patterns for calls like KG4AA vs KG4AAA
-   */
-  func performSearch(candidate: String, firstLetter: Character, nextLetter: Character, baseCall: String, searchBy: String) -> (mainPrefix: String, result: Bool) {
+    first we look in all the "." patterns for calls like KG4AA vs KG4AAA
+    
+    pass in the callStructure and a flag to use prefix or baseCall
+    */
+  func performSearch(candidate: String, callStructure: CallStructure, searchBy: SearchBy, saveHit: Bool) -> (mainPrefix: String, result: Bool) {
     
     var pattern = candidate + "."
     var temp = Set<PrefixData>()
     var list = Set<PrefixData>()
-
+    var firstLetter: Character
+    var searchTerm = ""
+    
+    switch searchBy {
+    case .BaseCall:
+      let baseCall = callStructure.baseCall
+      searchTerm = baseCall!
+      firstLetter = baseCall![0]
+    default:
+      let prefix = callStructure.prefix
+      firstLetter = prefix![0]
+      searchTerm = prefix!
+      if prefix!.count > 1 {
+      }
+    }
+    
     while (pattern.count > 1)
     {
       if let valuesExists = CallSignPatterns[pattern] {
+        temp = Set<PrefixData>()
         for prefixData in valuesExists {
-          temp = Set<PrefixData>()
+    
           if prefixData.indexKey.contains(firstLetter) {
             if pattern.last == "." {
-              if prefixData.maskExists(call: searchBy, length: pattern.count - 1) {
+              if prefixData.maskExists(call: searchTerm, length: pattern.count - 1) {
                 temp.insert(prefixData)
                 break
               }
             } else {
-              if prefixData.maskExists(call: searchBy, length: pattern.count) {
+              if prefixData.maskExists(call: searchTerm, length: pattern.count) {
                 temp.insert(prefixData)
                 break
               }
@@ -230,156 +258,83 @@ public class CallLookup: ObservableObject{
 
       pattern.removeLast()
     }
-    
-    return refineHits(list: list, firstLetter: firstLetter, nextLetter: nextLetter, baseCall: baseCall)
+
+
+    return refineHits(list: list, callStructure: callStructure, searchBy: searchBy, saveHit: saveHit)
   }
   
   /**
-   now we have a list of posibilities // HG5ACZ/P
-   */
-  func refineHits(list: Set<PrefixData>, firstLetter: Character, nextLetter: Character, baseCall: String) -> (mainPrefix: String, result: Bool) {
-    
+  now we have a list of posibilities // HG5ACZ/P
+  */
+  func refineHits(list: Set<PrefixData>, callStructure: CallStructure, searchBy: SearchBy, saveHit: Bool) -> (mainPrefix: String, result: Bool) {
+     
+    var firstLetter: Character
+    var nextLetter: String = ""
+    let baseCall = callStructure.baseCall
     var foundItems =  Set<PrefixData>()
     
-    switch list.count {
-    case 0:
-      return (mainPrefix: "", result: false)
-    case 1:
-      foundItems = list
+    switch searchBy {
+    case .BaseCall:
+      
+      firstLetter = baseCall![0]
+      nextLetter = String(baseCall![1])
     default:
-      for prefixData in list {
-        var rank = 0
-        var previous = true
-        let primaryMaskList = prefixData.getMaskList(first: String(firstLetter), second: String(nextLetter), stopFound: false)
-        
-        for maskList in primaryMaskList {
-          var position = 2
-          previous = true
-          
-          let length = min(maskList.count, baseCall.count)
-          for index in 2...length {
-            let anotherLetter = baseCall[index]
-            if maskList[position].contains(String(anotherLetter)) && previous {
-              rank = position + 1
-            } else {
-              previous = false
-              break
-            }
-            position += 1
-          }
-          
-          if rank == length || maskList.count == 2 {
-            var data = prefixData
-            data.rank = rank
-            foundItems.insert(data)
-          }
-        }
+      let prefix = callStructure.prefix
+      firstLetter = prefix![0]
+      if prefix!.count > 1 {
+         nextLetter = String(prefix![1])
       }
     }
     
-//    if (foundItems.Count > 0)
-//     {
-//         if (!saveHit)
-//         {
-//             mainPrefix = foundItems.First().MainPrefix;
-//             return true;
-//         }
-//         else
-//         {
-//             if (!MergeHits || foundItems.Count == 1)
-//             {
-//                 BuildHit(foundItems, callStructure, baseCall, fullCall);
-//                 mainPrefix = "";
-//             }
-//             else
-//             {
-//                 MergeMultipleHits(foundItems, callStructure, baseCall, fullCall);
-//                 mainPrefix = "";
-//             }
-//
-//             return true;
-//         }
-//     }
-// }
-//
-//               mainPrefix = "";
-//               return false;
-    
-    
-    return (mainPrefix: "", result: false)
-  }
-  
-  /**
-    
-  foreach (CallSignInfo info in list)
-  {
-      var rank = 0;
-      var previous = true;
-      var primaryMaskList = info.GetMaskList(firstLetter, nextLetter, stopFound);
-
-      foreach (List<string[]> maskList in primaryMaskList) // ToList uneccessary here
-      {
-          var position = 2;
-          previous = true;
-
-          // get smaller length
-          var length = baseCall.Length < maskList.Count ? baseCall.Length : maskList.Count;
-
-          for (var i = 2; i < length; i++)
-          {
-              var anotherLetter = baseCall.Substring(i, 1); //.Skip(i).First().ToString();
-
-              if (maskList[position].Contains(anotherLetter) && previous)
-              {
-                  rank = position + 1;
+    switch list.count {
+      case 0:
+        return (mainPrefix: "", result: false)
+      case 1:
+        foundItems = list
+      default:
+        for prefixData in list {
+          var rank = 0
+          var previous = true
+          let primaryMaskList = prefixData.getMaskList(first: String(firstLetter), second: nextLetter, stopFound: false)
+          
+          for maskList in primaryMaskList {
+            var position = 2
+            previous = true
+            
+            let length = min(maskList.count, baseCall!.count)
+            for index in 2...length {
+              let anotherLetter = baseCall![index]
+              if maskList[position].contains(String(anotherLetter)) && previous {
+                rank = position + 1
+              } else {
+                previous = false
+                break
               }
-              else
-              {
-                  previous = false;
-                  break;
-              }
-              position += 1;
+              position += 1
+            }
+            
+            if rank == length || maskList.count == 2 {
+              var data = prefixData
+              data.rank = rank
+              foundItems.insert(data)
+            }
           }
-
-          // if found with 2 chars
-          if (rank == length || maskList.Count == 2)
-          {
-              info.Rank = rank;
-              foundItems.Add(info);
-          }
+        }
       }
+      
+      if foundItems.count > 0 {
+        if !saveHit {
+          let items = Array(foundItems)
+          return (mainPrefix: items[0].mainPrefix, result: true)
+        } else {
+          let found = Array(foundItems)
+          buildHit(foundItems: found, callStructure: callStructure, prefix: baseCall!, fullCall: callStructure.baseCall)
+          return (mainPrefix: "", result: true)
+        }
+      }
+
+      return (mainPrefix: "", result: false)
   }
-                
-
-                  if (foundItems.Count > 0)
-                  {
-                      if (!saveHit)
-                      {
-                          mainPrefix = foundItems.First().MainPrefix;
-                          return true;
-                      }
-                      else
-                      {
-                          if (!MergeHits || foundItems.Count == 1)
-                          {
-                              BuildHit(foundItems, callStructure, baseCall, fullCall);
-                              mainPrefix = "";
-                          }
-                          else
-                          {
-                              MergeMultipleHits(foundItems, callStructure, baseCall, fullCall);
-                              mainPrefix = "";
-                          }
-
-                          return true;
-                      }
-                  }
-              }
-
-              mainPrefix = "";
-              return false;
-   */
-  
   
   /**
    Portable prefixes are prefixes that end with "/"
@@ -419,61 +374,23 @@ public class CallLookup: ObservableObject{
     return false
   }
   
+  /**
+   Build the hit and add it to the hitlist.
+   */
   func buildHit(foundItems: [PrefixData], callStructure: CallStructure , prefix: String, fullCall: String) {
     
-  }
-  /**
-   /// <summary>
-          /// Build the hit and add it to the hitlist.
-          /// </summary>
-          /// <param name="foundItems"></param>
-          /// <param name="baseCall"></param>
-          /// <param name="prefix"></param>
-          /// <param name="fullCall"></param>
-          private void BuildHit(HashSet<CallSignInfo> foundItems, CallStructure callStructure, string prefix, string fullCall)
-          {
-              CallSignInfo callSignInfoCopy = new CallSignInfo();
-              List<CallSignInfo> HighestRankList = foundItems.OrderByDescending(x => x.Rank).ThenByDescending(x => x.Kind).ToList();
-              Dictionary<int, int> dxccEntries = new Dictionary<int, int>();
-
-              foreach (CallSignInfo callSignInfo in HighestRankList)
-              {
-                  callSignInfoCopy = callSignInfo.ShallowCopy();
-                  callSignInfo.CallSignFlags = new HashSet<CallSignFlags>();
-                  callSignInfoCopy.CallSign = fullCall;
-                  callSignInfoCopy.BaseCall = callStructure.BaseCall;
-                  callSignInfoCopy.HitPrefix = prefix;
-                  callSignInfoCopy.CallSignFlags.UnionWith(callStructure.CallSignFlags);
-                  HitList.Add(callSignInfoCopy);
-
-                  // add calls to the cache - if the call exists we won't have to redo all the
-                  // processing earlier the next time it comes in
-                  if (IsBatchLookup)
-                  {
-                      if (!HitCache.ContainsKey(callSignInfoCopy.CallSign))
-                      {
-                          HitCache.TryAdd(callSignInfoCopy.CallSign, callSignInfoCopy);
-                      }
-                  }
-
-                  if (!UseQRZLookup)
-                  {
-                      continue;
-                  }
-
-                  if (QRZLookup.QRZLogon(QRZUserId, QRZPassword))
-                  {
-                      XDocument xDocument = QRZLookup.QRZRequest(callStructure.BaseCall);
-                      if (xDocument != null)
-                      {
-                          CallSignInfo callSignInfoQRZ = new CallSignInfo(xDocument);
-                          HitList.Add(callSignInfoQRZ);
-                      }
-                  }
-              }
-          }
-   */
+    let sortedItems = foundItems.sorted(by: { (prefixData0: PrefixData, prefixData1: PrefixData) -> Bool in
+      return prefixData0.rank < prefixData1.rank
+    })
     
+    for prefixData in sortedItems {
+      let hit = Hit(callSign: fullCall, prefixData: prefixData)
+      
+      //callSignInfoCopy.CallSignFlags.UnionWith(callStructure.CallSignFlags);
+      hitList.append(hit)
+    }
+  }
+  
     /**
      Search through the secondary prefixes.
      - parameters:
