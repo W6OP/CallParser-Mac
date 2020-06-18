@@ -238,12 +238,7 @@ public struct PrefixData: Hashable {
       indexKey.insert(Character(first))
     }
   }
-  /**
-  
-   */
-  
-  
-  
+ 
   /**
    Parse the FullPrefix to get the MainPrefix
    - parameters:
@@ -267,7 +262,6 @@ public struct PrefixData: Hashable {
     self.kind = prefixKind
     
     if prefixKind == PrefixKind.DXCC {
-      //adif = true
       province = ""
     }
   }

@@ -65,8 +65,6 @@ public struct Hit {
  */
 public class CallLookup: ObservableObject{
     
-    
-    
     var hitList: [Hit]!
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
@@ -169,6 +167,10 @@ public class CallLookup: ObservableObject{
     }
 }
   
+  /**
+   Search the CallSignDictionary for a hit with the full call. If it doesn't
+   hit remove characters from the end until hit or there are no letters fleft.
+   */
   func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
     _ = callStructure.baseCall
@@ -440,32 +442,32 @@ public class CallLookup: ObservableObject{
      - matches: The array of PrefixData to look at.
      - callSign: The call sign we are working with.
      */
-    func processMatches(matches: [PrefixData], callSign: String) {
-        
-        var callSet: Set<String>
-        var callSetList = [Set<String>]()
-      
-        // this needs to be the suffix if LU2ART/W4
-        for item in callSign{
-            callSet = Set<String>()
-            callSet.insert(String(item))
-            callSetList.append(callSet)
-        }
-        
-        for match in matches {
-            populateHitList(prefixData: match, callSign: callSign)
-//            if match.hasChildren {
-//                // now go through each child and find intersections
-//                for child in match.children {
-//                    for mask in child.primaryMaskSets{
-//                        if compareMask(mask: mask, callSetList: callSetList) {
-//                            populateHitList(prefixData: child, callSign: callSign)
-//                        }
-//                    }
-//                }
-//            }
-        }
-    }
+//    func processMatches(matches: [PrefixData], callSign: String) {
+//        
+//        var callSet: Set<String>
+//        var callSetList = [Set<String>]()
+//      
+//        // this needs to be the suffix if LU2ART/W4
+//        for item in callSign{
+//            callSet = Set<String>()
+//            callSet.insert(String(item))
+//            callSetList.append(callSet)
+//        }
+//        
+//        for match in matches {
+//            populateHitList(prefixData: match, callSign: callSign)
+////            if match.hasChildren {
+////                // now go through each child and find intersections
+////                for child in match.children {
+////                    for mask in child.primaryMaskSets{
+////                        if compareMask(mask: mask, callSetList: callSetList) {
+////                            populateHitList(prefixData: child, callSign: callSign)
+////                        }
+////                    }
+////                }
+////            }
+//        }
+//    }
     
     /**
      Compare the mask with the Set created with the call sign.
@@ -473,29 +475,29 @@ public class CallLookup: ObservableObject{
      - mask: The prefix to search for matches with.
      - callSetList: The set representing the call sign.
      */
-        func compareMask(mask: [Set<String>], callSetList: [Set<String>]) -> Bool {
-            
-            var maxCount = 0
-            var match = false
-            
-            // first find out which set is the smallest and we will only match that number a chars
-            let array = [mask, callSetList]
-            if let min = array.max(by: {$1.count < $0.count}) {
-                maxCount = min.count
-            }
-            
-            for i in 0..<maxCount {
-                //print("i:\(i) call:\(callSetList[i]) mask:\(mask[i])")
-                if callSetList[i].intersection(mask[i]).count != 0 {
-                    match = true
-                } else {
-                    match = false
-                    return match
-                }
-            }
-            
-            return match
-        }
+//        func compareMask(mask: [Set<String>], callSetList: [Set<String>]) -> Bool {
+//
+//            var maxCount = 0
+//            var match = false
+//
+//            // first find out which set is the smallest and we will only match that number a chars
+//            let array = [mask, callSetList]
+//            if let min = array.max(by: {$1.count < $0.count}) {
+//                maxCount = min.count
+//            }
+//
+//            for i in 0..<maxCount {
+//                //print("i:\(i) call:\(callSetList[i]) mask:\(mask[i])")
+//                if callSetList[i].intersection(mask[i]).count != 0 {
+//                    match = true
+//                } else {
+//                    match = false
+//                    return match
+//                }
+//            }
+//
+//            return match
+//        }
     
     /**
      Add to the HitList array if a match.
@@ -503,36 +505,36 @@ public class CallLookup: ObservableObject{
      - prefixData: The prefixData to add to the array.
      - callSign: The call sign we are working with.
      */
-        func populateHitList(prefixData: PrefixData, callSign: String) {
-            
-            if hitList == nil {
-                hitList = [Hit]()
-            }
-            
-            hitList.append(Hit(callSign: callSign, prefixData: prefixData))
-        }
+//        func populateHitList(prefixData: PrefixData, callSign: String) {
+//
+//            if hitList == nil {
+//                hitList = [Hit]()
+//            }
+//
+//            hitList.append(Hit(callSign: callSign, prefixData: prefixData))
+//        }
     
     /**
      Create a Set from the call sign to do Set operations with.
      - parameters:
      - callSign: The call sign to make into a Set.
      */
-    func getCallSetList(callSign: String) -> [Set<String>] {
-        
-        let callPart = callSign.prefix(4)
-        
-        var callSet: Set<String>
-        var callSetList = [Set<String>]()
-        
-        // this needs to be the suffix if LU2ART/W4
-        for item in callPart{
-            callSet = Set<String>()
-            callSet.insert(String(item))
-            callSetList.append(callSet)
-        }
-        
-        return callSetList
-    }
+//    func getCallSetList(callSign: String) -> [Set<String>] {
+//
+//        let callPart = callSign.prefix(4)
+//
+//        var callSet: Set<String>
+//        var callSetList = [Set<String>]()
+//
+//        // this needs to be the suffix if LU2ART/W4
+//        for item in callPart{
+//            callSet = Set<String>()
+//            callSet.insert(String(item))
+//            callSetList.append(callSet)
+//        }
+//
+//        return callSetList
+//    }
   
   /**
    Check if the call area needs to be replaced and do so if necessary.
@@ -541,24 +543,34 @@ public class CallLookup: ObservableObject{
    */
   func checkReplaceCallArea(callStructure: CallStructure, fullCall: String) -> Bool {
     
-    let digits = callStructure.prefix.onlyDigits
-    var mainPrefix = ""
+    let digits = callStructure.baseCall.onlyDigits
+    var position = 0
+    //(mainPrefix: String, result: Bool)
     
-    // UY0KM/0
+    // UY0KM/0 - prefix is single digit and same as call
     if callStructure.prefix == String(digits[0]) {
-//      if searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false, mainPrefix: &mainPrefix){
-//
-//
-//
-//
-//      }
+      callStructure.callStructureType = CallStructureType.Call
+      return true
     }
     
+    // W6OP/4 will get replace by W4
+      let found  = searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false)
+      if found.result {
+        
+        let oldDigit = callStructure.prefix
+        callStructure.prefix = replaceCallArea(mainPrefix: found.mainPrefix, prefix: callStructure.prefix, position: &position)
+        
+        
+      }
     
     return false
   }
   
-
+  
+  func replaceCallArea(mainPrefix: String, prefix: String,  position: inout Int) -> String{
+    
+    return ""
+  }
   /**
    /// <summary>
           /// Check if the call area needs to be replaced and do so if necessary.
