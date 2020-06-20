@@ -99,7 +99,7 @@ public enum CallSignType: String {
 
 enum SearchBy: String {
   case Prefix
-  case BaseCall
+  case Call
   case None
 }
 

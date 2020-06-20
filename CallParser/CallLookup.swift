@@ -173,7 +173,7 @@ public class CallLookup: ObservableObject{
    */
   func  searchMainDictionary(callStructure: CallStructure, fullCall: String, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
-    _ = callStructure.baseCall
+    //_ = callStructure.baseCall
     let prefix = callStructure.prefix
     
     var pattern: String
@@ -198,7 +198,7 @@ public class CallLookup: ObservableObject{
       pattern = callStructure.buildPattern(candidate: callStructure.prefix)
       
     default:
-      searchBy = SearchBy.BaseCall
+      searchBy = SearchBy.Call
       pattern = callStructure.buildPattern(candidate: callStructure.baseCall)
     }
     
@@ -219,7 +219,7 @@ public class CallLookup: ObservableObject{
     var searchTerm = ""
     
     switch searchBy {
-    case .BaseCall:
+    case .Call:
       let baseCall = callStructure.baseCall
       searchTerm = baseCall!
       firstLetter = baseCall![0]
@@ -276,7 +276,7 @@ public class CallLookup: ObservableObject{
     var foundItems =  Set<PrefixData>()
     
     switch searchBy {
-    case .BaseCall:
+    case .Call:
       
       firstLetter = baseCall![0]
       nextLetter = String(baseCall![1])
@@ -392,150 +392,7 @@ public class CallLookup: ObservableObject{
       hitList.append(hit)
     }
   }
-  
-    /**
-     Search through the secondary prefixes.
-     - parameters:
-     - callSign: The call sign we are working with.
-     - numberPart: The number in the call.
-     */
-//    func searchSecondaryPrefixes(callSign: String) -> [PrefixData] {
-//        
-//        var maxCount = 0
-//        var match = false
-//        var matches = [PrefixData]()
-//        
-//        let callSetList = getCallSetList(callSign: callSign)
-//
-//        for prefixData in prefixList {
-//            if prefixData.primaryMaskSets.count > 1 {
-//                for primaryMask in prefixData.primaryMaskSets {
-//                    let array = [primaryMask, callSetList]
-//                    if let min = array.max(by: {$1.count < $0.count}) {
-//                        maxCount = min.count
-//                    }
-//                    
-//                    for i in 0..<maxCount {
-//                        if callSetList[i].intersection(primaryMask[i]).count != 0 {
-//                            match = true
-//                        } else {
-//                            match = false
-//                            break
-//                        }
-//                    }
-//                    
-//                    if match == true {
-//                        matches.insert(prefixData, at: 0)
-//                    }
-//                }
-//            }
-//        }
-//        
-//        return matches
-//    }
-    
-    /**
-     With one or matches look for children and see if we can narrow
-     the location down more. Create a Hitlist for the primary or DXCC
-     entry. Add a hitlist for the most likely child.
-     - parameters:
-     - matches: The array of PrefixData to look at.
-     - callSign: The call sign we are working with.
-     */
-//    func processMatches(matches: [PrefixData], callSign: String) {
-//        
-//        var callSet: Set<String>
-//        var callSetList = [Set<String>]()
-//      
-//        // this needs to be the suffix if LU2ART/W4
-//        for item in callSign{
-//            callSet = Set<String>()
-//            callSet.insert(String(item))
-//            callSetList.append(callSet)
-//        }
-//        
-//        for match in matches {
-//            populateHitList(prefixData: match, callSign: callSign)
-////            if match.hasChildren {
-////                // now go through each child and find intersections
-////                for child in match.children {
-////                    for mask in child.primaryMaskSets{
-////                        if compareMask(mask: mask, callSetList: callSetList) {
-////                            populateHitList(prefixData: child, callSign: callSign)
-////                        }
-////                    }
-////                }
-////            }
-//        }
-//    }
-    
-    /**
-     Compare the mask with the Set created with the call sign.
-     - parameters:
-     - mask: The prefix to search for matches with.
-     - callSetList: The set representing the call sign.
-     */
-//        func compareMask(mask: [Set<String>], callSetList: [Set<String>]) -> Bool {
-//
-//            var maxCount = 0
-//            var match = false
-//
-//            // first find out which set is the smallest and we will only match that number a chars
-//            let array = [mask, callSetList]
-//            if let min = array.max(by: {$1.count < $0.count}) {
-//                maxCount = min.count
-//            }
-//
-//            for i in 0..<maxCount {
-//                //print("i:\(i) call:\(callSetList[i]) mask:\(mask[i])")
-//                if callSetList[i].intersection(mask[i]).count != 0 {
-//                    match = true
-//                } else {
-//                    match = false
-//                    return match
-//                }
-//            }
-//
-//            return match
-//        }
-    
-    /**
-     Add to the HitList array if a match.
-     - parameters:
-     - prefixData: The prefixData to add to the array.
-     - callSign: The call sign we are working with.
-     */
-//        func populateHitList(prefixData: PrefixData, callSign: String) {
-//
-//            if hitList == nil {
-//                hitList = [Hit]()
-//            }
-//
-//            hitList.append(Hit(callSign: callSign, prefixData: prefixData))
-//        }
-    
-    /**
-     Create a Set from the call sign to do Set operations with.
-     - parameters:
-     - callSign: The call sign to make into a Set.
-     */
-//    func getCallSetList(callSign: String) -> [Set<String>] {
-//
-//        let callPart = callSign.prefix(4)
-//
-//        var callSet: Set<String>
-//        var callSetList = [Set<String>]()
-//
-//        // this needs to be the suffix if LU2ART/W4
-//        for item in callPart{
-//            callSet = Set<String>()
-//            callSet.insert(String(item))
-//            callSetList.append(callSet)
-//        }
-//
-//        return callSetList
-//    }
-  
+ 
   /**
    Check if the call area needs to be replaced and do so if necessary.
    If the original call gets a hit, find the MainPrefix and replace
@@ -545,7 +402,7 @@ public class CallLookup: ObservableObject{
     
     let digits = callStructure.baseCall.onlyDigits
     var position = 0
-    //(mainPrefix: String, result: Bool)
+    
     
     // UY0KM/0 - prefix is single digit and same as call
     if callStructure.prefix == String(digits[0]) {
@@ -556,125 +413,73 @@ public class CallLookup: ObservableObject{
     // W6OP/4 will get replace by W4
       let found  = searchMainDictionary(callStructure: callStructure, fullCall: fullCall, saveHit: false)
       if found.result {
-        
-        let oldDigit = callStructure.prefix
         callStructure.prefix = replaceCallArea(mainPrefix: found.mainPrefix, prefix: callStructure.prefix, position: &position)
         
+        switch callStructure.prefix {
+          
+        case "":
+          callStructure.callStructureType = CallStructureType.Call;
+          
+        default:
+          callStructure.callStructureType = CallStructureType.PrefixCall;
+        }
         
+        collectMatches(callStructure: callStructure, fullCall: fullCall);
+        return true;
       }
     
     return false
   }
   
   
+  /**
+   
+   */
   func replaceCallArea(mainPrefix: String, prefix: String,  position: inout Int) -> String{
     
-    return ""
+    let oneCharPrefixes: [Character] = ["I", "K", "N", "W", "R", "U"]
+    let XNUM_SET: [Character] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  
+    switch mainPrefix.count {
+    case 1:
+      if oneCharPrefixes.contains(mainPrefix[0]){
+        // I9MRY/1 - mainPrefix = I --> I1
+        position = 2
+      } else  if mainPrefix.isAlphabetic {
+        // FA3L/6 - mainPrefix is F
+        position = 99
+        return ""
+      }
+
+    case 2:
+      if oneCharPrefixes.contains(mainPrefix[0]) && XNUM_SET.contains(mainPrefix[1]) {
+        // W6OP/4 - main prefix = W6 --> W4
+        position = 2
+      } else {
+        // AL7NS/4 - main prefix = KL --> KL4
+        position = 3
+      }
+
+    default:
+      if oneCharPrefixes.contains(mainPrefix[0]) && XNUM_SET.contains(mainPrefix[1]){
+        position = 2
+      }else {
+        if XNUM_SET.contains(mainPrefix[2]) {
+          // JI3DT/6 - mainPrefix = JA3 --> JA6
+          position = 3
+        } else {
+          // 3DLE/1 - mainprefix = 3DA --> 3DA1
+          position = 4
+        }
+      }
+    }
+
+    // append call area to mainPrefix
+    return mainPrefix.prefix(position - 1) + prefix + "/"
   }
+  
   /**
-   /// <summary>
-          /// Check if the call area needs to be replaced and do so if necessary.
-          /// If the original call gets a hit, find the MainPrefix and replace
-          /// the call area with the new call area. Then do a search with that.
-          /// </summary>
-          /// <param name="callStructure"></param>
-          /// <param name="fullCall"></param>
-          private bool CheckReplaceCallArea(CallStructure callStructure, string fullCall)
-          {
-              // UY0KM/0
-              if (callStructure.Prefix != callStructure.BaseCall.FirstOrDefault(c => char.IsDigit(c)).ToString())
-              {
-                  try
-                  {
-                      if (SearchMainDictionary(callStructure, fullCall, false, out string mainPrefix))
-                      {
-                          var oldDigit = callStructure.Prefix;
-                          callStructure.Prefix = ReplaceCallArea(mainPrefix, callStructure.Prefix, out int position);
-                          switch (callStructure.Prefix)
-                          {
-                              case "":
-                                  // M0CCA/6 - main prefix is "G", F8ATS/9 - Should I replace the digit?
-                                  callStructure.CallStructureType = CallStructureType.Call;
-                                  break;
-                              default:
-                                  // replace the digit in case we don't find it by it's main prefix
-                                  callStructure.BaseCall = callStructure.BaseCall.Remove(position - 1, 1).Insert(position - 1, oldDigit);
-                                  callStructure.CallStructureType = CallStructureType.PrefixCall;
-                                  break;
-                          }
-
-                          CollectMatches(callStructure, fullCall);
-                          return true;
-                      }
-                  }
-                  catch (Exception ex)
-                  {
-                      var a = 1;
-                  }
-              }
-
-              return false;
-          }
-
-          /// <summary>
-          /// Replace the call area with the prefix digit.
-          /// </summary>
-          /// <param name="mainPrefix"></param>
-          /// <param name="callArea"></param>
-          /// <returns></returns>
-          private string ReplaceCallArea(string mainPrefix, string callArea, out int position)
-          {
-              char[] OneCharPrefs = new char[] { 'I', 'K', 'N', 'W', 'R', 'U' };
-              char[] XNUM_SET = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '#', '[' };
-
-              int p = 0;
-
-              switch (mainPrefix.Length)
-              {
-                  case 1:
-                      if (OneCharPrefs.Contains(mainPrefix.First()))
-                      {
-                          p = 2;
-                      }
-                      else if (mainPrefix.All(char.IsLetter))
-                      {
-                          position = 99;
-                          return "";
-                      }
-                      break;
-                  case 2:
-                      if (OneCharPrefs.Contains(mainPrefix.First()) && XNUM_SET.Contains(mainPrefix.Skip(1).First()))
-                      {
-                          p = 2;
-                      }
-                      else
-                      {
-                          p = 3;
-                      }
-                      break;
-                  default:
-                      if (OneCharPrefs.Contains(mainPrefix.First()) && XNUM_SET.Contains(mainPrefix.Skip(1).Take(1).First()))
-                      {
-                          p = 2;
-                      }
-                      else
-                      {
-                          if (XNUM_SET.Contains(mainPrefix.Skip(2).Take(1).First()))
-                          {
-                              p = 3;
-                          }
-                          else
-                          {
-                              p = 4;
-                          }
-                      }
-                      break;
-              }
-
-              position = p;
-
-              return $"{mainPrefix.Substring(0, p - 1)}{callArea}";
-          }
+   
    */
     
     
