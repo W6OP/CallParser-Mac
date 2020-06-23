@@ -66,6 +66,9 @@ public class PrefixFileParser: NSObject, ObservableObject {
         
         recordKey = "prefix"
         
+      // load compound file
+      // https://stackoverflow.com/questions/29217554/swift-text-file-to-array-of-strings
+      
       // define the bundle
         let bundle = Bundle(identifier: "com.w6op.CallParser")
         guard let url = bundle!.url(forResource: "PrefixList", withExtension: "xml") else {
@@ -207,7 +210,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
         
       default:
         // should never default
-        print("hit default - buildPatternEx")
+        print("should never default - hit default - buildPattern Line 213 \(maskPart)")
       }
     }
     

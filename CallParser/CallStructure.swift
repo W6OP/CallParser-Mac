@@ -10,7 +10,6 @@ import Foundation
 
 public class CallStructure {
   
-  
   private var singleCharacterPrefixes: [String] = ["F", "G", "M", "I", "R", "W" ]
   
   public var prefix: String!
@@ -57,10 +56,8 @@ public class CallStructure {
    */
   func getComponentType(callSign: String) -> StringTypes {
     
-    let state = false
-    
     // THIS NEEDS CHECKING
-    switch state {
+    switch false {
     case callSign.trimmingCharacters(in: .whitespaces).isEmpty:
       return StringTypes.Valid
     case callSign.trimmingCharacters(in: .punctuationCharacters).isEmpty:
@@ -125,9 +122,7 @@ public class CallStructure {
     
     // ValidStructures = 'C#:CM:CP:CT:PC:'
     
-    let state = true
-    
-    switch state {
+    switch true {
     // if either is invalid short cicuit all the checks and exit immediately
     case component0Type == ComponentType.Invalid || component1Type == ComponentType.Invalid:
       return
@@ -504,7 +499,7 @@ public class CallStructure {
   }
   
   /**
-   est if a candidate is truly a prefix.
+   Test if a candidate is truly a prefix.
    */
   func verifyIfPrefix(candidate: String, position: Int) -> ComponentType {
     
@@ -535,41 +530,6 @@ public class CallStructure {
     return ComponentType.Text;
   }
   
-  
-  /**
-   Build a pattern that models the string passed in.
-   This is essentialy a duplicate of one in PrefixFileParser
-   TODO: Reconcile the two
-   */
-  func buildPatternOld(candidate: String) -> String {
-
-    var pattern = ""
-
-    if candidate.allSatisfy({String($0).isInteger}){
-      pattern += "#"
-    } else if candidate.allSatisfy({!String($0).isInteger}){
-      switch candidate[0] {
-      case "/":
-        pattern += "/"
-      case ".":
-        pattern += "."
-      default:
-        pattern += "@"
-      }
-    } else { // "?"
-      pattern += "?"
-    }
-    
-    if pattern.contains("?") {
-      // # @  - only one (invalid prefix) has two ?  -- @# @@
-      var tempPattern = pattern.replacingOccurrences(of: "?", with: "#")
-      tempPattern = pattern.replacingOccurrences(of: "?", with: "@")
-      return tempPattern
-    }
-    
-    return pattern
-  }
-  
   /**
    Build the pattern from the mask
    KG4@@.
@@ -597,7 +557,7 @@ public class CallStructure {
       
       default:
         // should never default
-        print("hit default - buildPattern")
+        print("hit default - buildPattern \(item) line 600")
       }
     }
       return pattern

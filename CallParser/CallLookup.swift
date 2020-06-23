@@ -9,7 +9,10 @@
 import Foundation
 import Combine
 
-public struct Hit {
+public struct Hit: Identifiable, Hashable {
+  
+    public var id = UUID()
+  
     public var call = ""                   //call sign as input
     public var kind = PrefixKind.None    //kind
     public var country = ""                //country
@@ -65,7 +68,7 @@ public struct Hit {
  */
 public class CallLookup: ObservableObject{
     
-    var hitList: [Hit]!
+    @Published public var hitList = [Hit]()
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
     var CallSignPatterns: [String: [PrefixData]]
@@ -89,13 +92,73 @@ public class CallLookup: ObservableObject{
      - parameters:
      - callSign: The call sign we want to process.
      */
-    public func lookupCall(call: String) throws -> [Hit] {
+    public func lookupCall(call: String) -> [Hit] {
       
             hitList = [Hit]()
             processCallSign(callSign: call.uppercased())
      
-            return self.hitList ?? [Hit]()
+            return hitList
     }
+  
+  /**
+   
+   */
+  func lookupCallBatch(callList: [String]) -> [Hit] {
+    
+          var count = 0
+          hitList = [Hit]()
+    
+          for call in callList {
+            processCallSign(callSign: call.uppercased())
+            //print(call)
+            count += 1
+            if count > 1000 {
+              break
+            }
+          }
+    
+          return hitList
+  }
+  
+  /**
+   Load the compound call file for testing.
+   - parameters:
+   */
+  public func loadCompoundFile() -> [Hit] {
+    var batch = [String]()
+    
+    let bundle = Bundle(identifier: "com.w6op.CallParser")
+    guard let url = bundle!.url(forResource: "pskreporter", withExtension: "csv") else {
+        print("Invalid prefix file: ")
+        return [Hit]()
+        // later make this throw
+    }
+    
+        do {
+          let contents = try String(contentsOf: url)
+          let text: [String] = contents.components(separatedBy: "\r\n")
+          print("Loaded: \(text.count)")
+          for callSign in text{
+            //print(callSign)
+            batch.append(callSign)
+            //try? print(lookupCall(call: callSign))
+          }
+        } catch {
+            // contents could not be loaded
+          print("Invalid compund file: ")
+        }
+    
+        return lookupCallBatch(callList: batch)
+    
+  }
+  
+  /**
+  Run the batch job with the compound call file.
+  - parameters:
+  */
+  public func runBatchJob() {
+    
+  }
     
     /**
      Process a call sign into its component parts ie: W6OP/V31
@@ -105,6 +168,12 @@ public class CallLookup: ObservableObject{
     func processCallSign(callSign: String) {
       
         var call = ""// = callSign
+      
+      // if there are spaces in the call don't process it
+      call = callSign.replacingOccurrences(of: " ", with: "")
+        if call.count != callSign.count {
+          return
+        }
       
       // strip leading or trailing "/"  /W6OP/
       if callSign.first(where: {$0 == "/"}) != nil {

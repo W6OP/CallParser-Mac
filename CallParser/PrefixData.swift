@@ -89,7 +89,7 @@ public struct PrefixData: Hashable {
    */
   func maskExists(call: String, length: Int) -> Bool {
     
-    let subCall = call[0...length]
+    let subCall = call[0...length - 1]
     let first = String(subCall[0])
     let second = String(subCall[1])
     let portable = "/"
