@@ -87,17 +87,13 @@ public class CallStructure {
       {
         callStructureType = CallStructureType.Invalid;
       }
-      break
     case 2:
       processComponents(component0: components[0], component1: components[1]);
-      break
     case 3:
       processComponents(component0: components[0], component1: components[1], component2: components[2]);
-      break
     default:
       return
     }
-    
   }
   
   /**
@@ -113,7 +109,6 @@ public class CallStructure {
     component1Type = getComponentType(candidate: component1, position: 2)
     
     if component0Type == ComponentType.Unknown || component1Type == ComponentType.Unknown {
-      //ResolveAmbiguities(component0Type, component1Type, out component0Type, out component1Type);
       resolveAmbiguities(componentType0: component0Type, componentType1: component1Type, component0Type: &component0Type, component1Type: &component1Type);
     }
     
@@ -123,9 +118,19 @@ public class CallStructure {
     // ValidStructures = 'C#:CM:CP:CT:PC:'
     
     switch true {
-    // if either is invalid short cicuit all the checks and exit immediately
+    // if either invalid short cicuit all the checks and exit immediately
     case component0Type == ComponentType.Invalid || component1Type == ComponentType.Invalid:
       return
+      
+//      // CI
+//      case component0Type == ComponentType.CallSign && component1Type == ComponentType.Invalid:
+//        callStructureType = CallStructureType.Call
+//      
+//      // IC
+//      case component0Type == ComponentType.Invalid && component1Type == ComponentType.CallSign:
+//        baseCall = component1
+//        prefix = component0
+//        callStructureType = CallStructureType.Call
       
     // CP
     case component0Type == ComponentType.CallSign && component1Type == ComponentType.Prefix:
@@ -157,6 +162,13 @@ public class CallStructure {
       callStructureType = CallStructureType.CallText
       setCallSignFlags(component1: component1, component2: "")
       
+      // CT
+      case component0Type == ComponentType.Text && component1Type == ComponentType.CallSign:
+        callStructureType = CallStructureType.CallText
+        baseCall = component1;
+        prefix = component0;
+        setCallSignFlags(component1: component1, component2: "")
+      
     // C#
     case component0Type == ComponentType.CallSign && component1Type == ComponentType.Numeric:
       callStructureType = CallStructureType.CallDigit
@@ -174,6 +186,7 @@ public class CallStructure {
       prefix = component0;
       
     default:
+      callStructureType = CallStructureType.Call
       return
     }
   }
@@ -192,6 +205,7 @@ public class CallStructure {
     component2Type = getComponentType(candidate: component2, position: 3)
     
     if component0Type == ComponentType.Unknown || component1Type == ComponentType.Unknown {
+      // this should probably be expanded
       resolveAmbiguities(componentType0: component0Type, componentType1: component1Type, component0Type: &component0Type, component1Type: &component1Type)
     }
     
@@ -200,10 +214,10 @@ public class CallStructure {
     suffix1 = component2;
     
     // ValidStructures = 'C#M:C#T:CM#:CMM:CMP:CMT:CPM:PCM:PCT:'
-    let state = false
-    switch state {
-    // if either is invalid short cicuit all the checks and exit immediately
-    case component0Type == ComponentType.Invalid || component1Type == ComponentType.Invalid || component2Type == ComponentType.Invalid:
+
+    switch true {
+    // if all are invalid short cicuit all the checks and exit immediately
+    case component0Type == ComponentType.Invalid && component1Type == ComponentType.Invalid && component2Type == ComponentType.Invalid:
       return
       
     // C#M
@@ -259,7 +273,7 @@ public class CallStructure {
       suffix1 = component2
       callStructureType = CallStructureType.PrefixCallText
       
-      
+      // CM#
     case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable && component2Type == ComponentType.Numeric:
       baseCall = component0
       prefix = component2
@@ -268,6 +282,7 @@ public class CallStructure {
       callStructureType = CallStructureType.CallDigitPortable
       
     default:
+      callStructureType = CallStructureType.Call
       return
     }
   }
@@ -309,67 +324,66 @@ public class CallStructure {
   
   /**
    ///FStructure:= StringReplace(FStructure, 'UU', 'PC', [rfReplaceAll]);
+   
+   // I don't agree with these two
    ///FStructure:= StringReplace(FStructure, 'CU', 'CP', [rfReplaceAll]);
    ///FStructure:= StringReplace(FStructure, 'UC', 'PC', [rfReplaceAll]);
+   
    ///FStructure:= StringReplace(FStructure, 'UP', 'CP', [rfReplaceAll]);
    ///FStructure:= StringReplace(FStructure, 'PU', 'PC', [rfReplaceAll]);
    ///FStructure:= StringReplace(FStructure, 'U', 'C', [rfReplaceAll]);
    */
   func resolveAmbiguities(componentType0: ComponentType, componentType1: ComponentType, component0Type: inout ComponentType, component1Type: inout ComponentType){
-    
-    let state = false
-    
-    switch state {
+   
+    switch true {
     // UU --> PC
     case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.Unknown:
       component0Type = ComponentType.Prefix
       component1Type = ComponentType.CallSign
-      return
       
     // CU --> CP
-    case componentType0 == ComponentType.CallSign && componentType1 == ComponentType.Unknown:
+      // CU --> CI
+      case componentType0 == ComponentType.CallSign && componentType1 == ComponentType.Unknown:
       component0Type = ComponentType.CallSign
-      component1Type = ComponentType.Prefix
-      return
+      component1Type = ComponentType.Invalid
+//    case componentType0 == ComponentType.CallSign && componentType1 ==    ComponentType.Unknown:
+//      component0Type = ComponentType.CallSign
+//      component1Type = ComponentType.Prefix
       
     // UC --> PC
-    case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.CallSign:
-      component0Type = ComponentType.Prefix
+      // UC --> IC
+      case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.CallSign:
+      component0Type = ComponentType.Invalid
       component1Type = ComponentType.CallSign
-      return
+//    case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.CallSign:
+//      component0Type = ComponentType.Prefix
+//      component1Type = ComponentType.CallSign
       
     // UP --> CP
     case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.Prefix:
       component0Type = ComponentType.CallSign
       component1Type = ComponentType.Prefix
-      return
       
     // PU --> PC
     case componentType0 == ComponentType.Prefix && componentType1 == ComponentType.Unknown:
       component0Type = ComponentType.Prefix
       component1Type = ComponentType.CallSign
-      return
       
     // U --> C
     case componentType0 == ComponentType.Unknown:
       component0Type = ComponentType.CallSign
       component1Type = componentType1
-      return
       
     // U --> C
     case componentType1 == ComponentType.Unknown:
       component1Type = ComponentType.CallSign;
       component0Type = componentType0;
-      return
       
-    case true:
-      break
-    case false:
-      break
+    default:
+      component0Type = ComponentType.Unknown
+      component1Type = ComponentType.Unknown
     }
-    
-    component0Type = ComponentType.Unknown
-    component1Type = ComponentType.Unknown
+
   }
   
   /*
@@ -390,20 +404,24 @@ public class CallStructure {
     
     let pattern = buildPattern(candidate: candidate)
     
-    let test = true
-    switch test {
+    switch true {
+      
     case position == 1 && candidate == "MM":
       return ComponentType.Prefix
+    
     case position == 1 && candidate.count == 1:
       return verifyIfPrefix(candidate: candidate, position: position)
+    
     case isSuffix(candidate: candidate):
       return ComponentType.Portable
+    
     case candidate.count == 1:
       if candidate.isInteger {
         return ComponentType.Numeric
       } else {
         return ComponentType.Text
       }
+    
     case candidate.isAlphabetic:
       if candidate.count > 2 {
         return ComponentType.Text
