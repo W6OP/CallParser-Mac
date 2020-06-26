@@ -27,7 +27,7 @@ public struct PrefixData: Hashable {
  
   var mainPrefix = ""             //label ie: 3B6
   var fullPrefix = ""             // ie: 3B6.3B7
-  var kind = PrefixKind.None    //kind
+  var kind = PrefixKind.none    //kind
   var country = ""                //country
   var province = ""               //province
   var city = ""                    //city
@@ -261,7 +261,7 @@ public struct PrefixData: Hashable {
     
     self.kind = prefixKind
     
-    if prefixKind == PrefixKind.DXCC {
+    if prefixKind == PrefixKind.dXCC {
       province = ""
     }
   }

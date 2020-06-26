@@ -11,31 +11,31 @@ import Foundation
 // MARK: - PrefixKind Enum ----------------------------------------------------------------------------
 
 public enum PrefixKind:  String {
-    case None = "pfNone"
-    case DXCC = "pfDXCC"
-    case Province = "pfProvince"
-    case Station = "pfStation"
-    case DelDXCC = "pfDelDXCC"
-    case OldPrefix = "pfOldPrefix"
-    case NonDXCC = "pfNonDXCC"
-    case InvalidPrefix = "pfInvalidPrefix"
-    case DelProvince = "pfDelProvince"
-    case City = "pfCity"
+    case none = "pfNone"
+    case dXCC = "pfDXCC"
+    case province = "pfProvince"
+    case station = "pfStation"
+    case delDXCC = "pfDelDXCC"
+    case oldPrefix = "pfOldPrefix"
+    case nonDXCC = "pfNonDXCC"
+    case invalidPrefix = "pfInvalidPrefix"
+    case delProvince = "pfDelProvince"
+    case city = "pfCity"
 }
 
 // MARK: - CallSignFlags Enum ----------------------------------------------------------------------------
 
 public enum CallSignFlags:  String {
-  case None = "cfNone"
-  case Invalid = "cfInvalid"
-  case   Maritime = "cfMaritime"
-  case Portable = "cfPortable"
-  case Special = "cfSpecial"
-  case Club = "cfClub"
-  case Beacon = "cfBeacon"
-  case Lotw = "cfLotw"
-  case AmbigPrefix = "cfAmbigPrefix"
-  case Qrp = "cfQrp"
+  case none = "cfNone"
+  case invalid = "cfInvalid"
+  case maritime = "cfMaritime"
+  case portable = "cfPortable"
+  case special = "cfSpecial"
+  case club = "cfClub"
+  case beacon = "cfBeacon"
+  case lotw = "cfLotw"
+  case ambigPrefix = "cfAmbigPrefix"
+  case qrp = "cfQrp"
 }
 
 // MARK: - Valid Structures Enum ----------------------------------------------------------------------------
@@ -44,63 +44,63 @@ public enum CallSignFlags:  String {
  ValidStructures = ':C:C#:C#M:C#T:CM:CM#:CMM:CMP:CMT:CP:CPM:CT:PC:PCM:PCT:';
  */
 public enum CallStructureType: String {
-  case Call = "C"
-  case CallDigit = "C#"
-  case CallDigitPortable = "C#M"
-  case CallDigitText = "C#T"
-  case CallPortable = "CM"
-  case CallPortableDigit = "CM#"
-  case CallPortablePortable = "CMM"
-  case CallPortablePrefix = "CMP"
-  case CallPortableText = "CMT"
-  case CallPrefix = "CP"
-  case CallPrefixPortable = "CPM"
-  case CallText = "CT"
-  case PrefixCall = "PC"
-  case PrefixCallPortable = "PCM"
-  case PrefixCallText = "PCT"
-  case Invalid = "Invalid"
+  case call = "C"
+  case callDigit = "C#"
+  case callDigitPortable = "C#M"
+  case callDigitText = "C#T"
+  case callPortable = "CM"
+  case callPortableDigit = "CM#"
+  case callPortablePortable = "CMM"
+  case callPortablePrefix = "CMP"
+  case callPortableText = "CMT"
+  case callPrefix = "CP"
+  case callPrefixPortable = "CPM"
+  case callText = "CT"
+  case prefixCall = "PC"
+  case prefixCallPortable = "PCM"
+  case prefixCallText = "PCT"
+  case invalid = "Invalid"
 }
 
 enum StringTypes: String {
-  case Numeric
-  case Text
-  case Invalid
-  case Valid
+  case numeric
+  case text
+  case invalid
+  case valid
 }
 
 
 enum ComponentType {
-  case CallSign
-  case CallOrPrefix
-  case Prefix
-  case Text
-  case Numeric
-  case Portable
-  case Unknown
-  case Invalid
-  case Valid
+  case callSign
+  case callOrPrefix
+  case prefix
+  case text
+  case numeric
+  case portable
+  case unknown
+  case invalid
+  case valid
 }
 
 // EndingPreserve = ':R:P:M:';
 // EndingIgnore = ':AM:MM:QRP:A:B:BCN:LH:';
 public enum CallSignType: String {
-    case A = "A"
-    case ADIF = "ADIF"
-    case B = "B"
-    case BCN = "Beacon"
-    case LH = "LH"
-    case M = "Mobile"
-    case MM = "Marine Mobile"
-    case P = "Portable"
-    case QRP = "Low Power"
-    case R = "Rover"
+    case a = "A"
+    case adif = "ADIF"
+    case b = "B"
+    case bcn = "Beacon"
+    case lh = "LH"
+    case m = "Mobile"
+    case mm = "Marine Mobile"
+    case p = "Portable"
+    case qrp = "Low Power"
+    case r = "Rover"
 }
 
 enum SearchBy: String {
-  case Prefix
-  case Call
-  case None
+  case prefix
+  case call
+  case none
 }
 
 

@@ -17,7 +17,7 @@ import Network
  https://www.electrollama.net/blog/2017/1/6/updating-ui-from-background-threads-simple-threading-in-swift-3-for-ios
  */
 func BG(_ block: @escaping ()->Void) {
-    DispatchQueue.global(qos: .background).async(execute: block)
+  DispatchQueue.global(qos: .utility).async(execute: block)
 }
 
 /**  USAGE:
@@ -40,7 +40,7 @@ public class PrefixFileParser: NSObject, ObservableObject {
     //public var prefixList = [PrefixData]()
     // pattern is key
   // rename to prefixPatterns
-    public var CallSignPatterns = [String: [PrefixData]]()
+    public var callSignPatterns = [String: [PrefixData]]()
     // pattern is key
     public var portablePrefixes = [String: [PrefixData]]()
     public var adifs = [Int: PrefixData]()
@@ -135,38 +135,38 @@ public class PrefixFileParser: NSObject, ObservableObject {
    AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ]
    The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
    */
-  func buildPatternOld(primaryMaskList: [[String]]) {
-    var pattern = ""
-    var patternList = [String]()
-    
-    for maskPart in primaryMaskList {
-      if maskPart.allSatisfy({$0.isInteger}){
-        pattern += "#"
-      } else if maskPart.allSatisfy({!$0.isInteger}){
-        switch maskPart[0] {
-        case "/":
-          pattern += "/"
-        case ".":
-          pattern += "."
-        default:
-          pattern += "@"
-        }
-      } else { // "?"
-        pattern += "?"
-      }
-    }
-    
-    if pattern.contains("?") {
-      // # @  - only one (invalid prefix) has two ?  -- @# @@
-      patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
-      patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
-      savePatternList(patternList: patternList)
-      return
-    }
-    
-    patternList.append(pattern)
-    savePatternList(patternList: patternList)
-  }
+//  func buildPatternOld(primaryMaskList: [[String]]) {
+//    var pattern = ""
+//    var patternList = [String]()
+//
+//    for maskPart in primaryMaskList {
+//      if maskPart.allSatisfy({$0.isInteger}){
+//        pattern += "#"
+//      } else if maskPart.allSatisfy({!$0.isInteger}){
+//        switch maskPart[0] {
+//        case "/":
+//          pattern += "/"
+//        case ".":
+//          pattern += "."
+//        default:
+//          pattern += "@"
+//        }
+//      } else { // "?"
+//        pattern += "?"
+//      }
+//    }
+//
+//    if pattern.contains("?") {
+//      // # @  - only one (invalid prefix) has two ?  -- @# @@
+//      patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
+//      patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
+//      savePatternList(patternList: patternList)
+//      return
+//    }
+//
+//    patternList.append(pattern)
+//    savePatternList(patternList: patternList)
+//  }
   
   /**
    Build the pattern from the mask
@@ -241,12 +241,12 @@ public class PrefixFileParser: NSObject, ObservableObject {
           portablePrefixes[pattern] = [PrefixData](arrayLiteral: prefixData)
         }
       default:
-        if prefixData.kind != PrefixKind.InvalidPrefix {
-          if var valueExists = CallSignPatterns[pattern] {
+        if prefixData.kind != PrefixKind.invalidPrefix {
+          if var valueExists = callSignPatterns[pattern] {
             valueExists.append(prefixData)
-            CallSignPatterns[pattern] = valueExists
+            callSignPatterns[pattern] = valueExists
           } else {
-            CallSignPatterns[pattern] = [PrefixData](arrayLiteral: prefixData)
+            callSignPatterns[pattern] = [PrefixData](arrayLiteral: prefixData)
           }
         }
       }
@@ -316,9 +316,9 @@ public class PrefixFileParser: NSObject, ObservableObject {
     
     // 1-5
     if first.isInteger && second.isInteger {
-      if let a = Int(first){
-        if let b = Int(second){
-          let intArray: [Int] = Array(a...b)
+      if let firstInteger = Int(first) {
+        if let secondInteger = Int(second) {
+          let intArray: [Int] = Array(firstInteger...secondInteger)
           expando = intArray.dropFirst().map { String($0) }
         }
       }
@@ -326,11 +326,11 @@ public class PrefixFileParser: NSObject, ObservableObject {
     
     // 0-C - NOT TESTED
     if first.isInteger && !second.isInteger {
-      if let a = Int(first){
+      if let firstInteger = Int(first){
           let range: Range<String.Index> = alphabet.range(of: second)!
           let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
          
-        let _: [Int] = Array(a...9)
+        let _: [Int] = Array(firstInteger...9)
           let myRange: ClosedRange = 0...index
       
         for item in alphabet[myRange] {
@@ -343,11 +343,11 @@ public class PrefixFileParser: NSObject, ObservableObject {
     
     // W-3 - NOT TESTED
     if !first.isInteger && second.isInteger {
-      if let a = Int(second){
+      if let secondInteger = Int(second){
           let range: Range<String.Index> = alphabet.range(of: first)!
           let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
          
-        let _: [Int] = Array(0...a)
+        let _: [Int] = Array(0...secondInteger)
           let myRange: ClosedRange = index...25
       
         for item in alphabet[myRange] {

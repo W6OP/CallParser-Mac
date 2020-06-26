@@ -14,11 +14,12 @@ public class CallStructure {
   
   public var prefix: String!
   public var baseCall: String!
+  public var fullCall: String!
   private var suffix1: String!
   private var suffix2: String!
   
   private var callSignFlags = [CallSignFlags]()
-  public var callStructureType = CallStructureType.Invalid
+  public var callStructureType = CallStructureType.invalid
   private var portablePrefixes: [String: [PrefixData]]!
   
   /**
@@ -27,6 +28,7 @@ public class CallStructure {
   public init(callSign: String, portablePrefixes: [String: [PrefixData]]) {
     self.portablePrefixes = portablePrefixes
     
+    fullCall = callSign
     splitCallSign(callSign: callSign);
   }
   
@@ -42,7 +44,7 @@ public class CallStructure {
     let components = callSign.components(separatedBy:"/")
     
     for item in components {
-      if getComponentType(callSign: item) == StringTypes.Invalid {
+      if getComponentType(callSign: item) == StringTypes.invalid {
         return
       }
     }
@@ -59,13 +61,13 @@ public class CallStructure {
     // THIS NEEDS CHECKING
     switch false {
     case callSign.trimmingCharacters(in: .whitespaces).isEmpty:
-      return StringTypes.Valid
+      return StringTypes.valid
     case callSign.trimmingCharacters(in: .punctuationCharacters).isEmpty:
-      return StringTypes.Valid
+      return StringTypes.valid
     case callSign.trimmingCharacters(in: .illegalCharacters).isEmpty:
-      return StringTypes.Valid
+      return StringTypes.valid
     default:
-      return StringTypes.Invalid
+      return StringTypes.invalid
     }
   }
   
@@ -78,14 +80,14 @@ public class CallStructure {
     case 0:
       return
     case 1:
-      if verifyIfCallSign(component: components[0]) == ComponentType.CallSign
+      if verifyIfCallSign(component: components[0]) == ComponentType.callSign
       {
         baseCall = components[0];
-        callStructureType = CallStructureType.Call;
+        callStructureType = CallStructureType.call;
       }
       else
       {
-        callStructureType = CallStructureType.Invalid;
+        callStructureType = CallStructureType.invalid;
       }
     case 2:
       processComponents(component0: components[0], component1: components[1]);
@@ -108,7 +110,7 @@ public class CallStructure {
     component0Type = getComponentType(candidate: component0, position: 1)
     component1Type = getComponentType(candidate: component1, position: 2)
     
-    if component0Type == ComponentType.Unknown || component1Type == ComponentType.Unknown {
+    if component0Type == ComponentType.unknown || component1Type == ComponentType.unknown {
       resolveAmbiguities(componentType0: component0Type, componentType1: component1Type, component0Type: &component0Type, component1Type: &component1Type);
     }
     
@@ -119,74 +121,63 @@ public class CallStructure {
     
     switch true {
     // if either invalid short cicuit all the checks and exit immediately
-    case component0Type == ComponentType.Invalid || component1Type == ComponentType.Invalid:
+    case component0Type == ComponentType.invalid || component1Type == ComponentType.invalid:
       return
       
-//      // CI
-//      case component0Type == ComponentType.CallSign && component1Type == ComponentType.Invalid:
-//        callStructureType = CallStructureType.Call
-//      
-//      // IC
-//      case component0Type == ComponentType.Invalid && component1Type == ComponentType.CallSign:
-//        baseCall = component1
-//        prefix = component0
-//        callStructureType = CallStructureType.Call
-      
     // CP
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Prefix:
-      callStructureType = CallStructureType.CallPrefix
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.prefix:
+      callStructureType = CallStructureType.callPrefix
       
     // PC
-    case component0Type == ComponentType.Prefix && component1Type == ComponentType.CallSign:
-      callStructureType = CallStructureType.PrefixCall
+    case component0Type == ComponentType.prefix && component1Type == ComponentType.callSign:
+      callStructureType = CallStructureType.prefixCall
       setCallSignFlags(component1: component0, component2: "")
       baseCall = component1;
       prefix = component0;
       
     // PP
-    case component0Type == ComponentType.Prefix && component1Type == ComponentType.Portable:
-      callStructureType = CallStructureType.Invalid
+    case component0Type == ComponentType.prefix && component1Type == ComponentType.portable:
+      callStructureType = CallStructureType.invalid
       
     // CC  ==> CP - check BU - BY - VU4 - VU7
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.CallSign:
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.callSign:
       if (component1.prefix(1) == "B") {
-        callStructureType = CallStructureType.CallPrefix;
+        callStructureType = CallStructureType.callPrefix;
         setCallSignFlags(component1: component0, component2: "");
       } else if component0.prefix(3) == "VU4" || component0.prefix(3) == "VU7" {
-        callStructureType = CallStructureType.CallPrefix;
+        callStructureType = CallStructureType.callPrefix;
         setCallSignFlags(component1: component1, component2: "");
       }
       
     // CT
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Text:
-      callStructureType = CallStructureType.CallText
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.text:
+      callStructureType = CallStructureType.callText
       setCallSignFlags(component1: component1, component2: "")
       
-      // CT
-      case component0Type == ComponentType.Text && component1Type == ComponentType.CallSign:
-        callStructureType = CallStructureType.CallText
+      // TC
+      case component0Type == ComponentType.text && component1Type == ComponentType.callSign:
+        callStructureType = CallStructureType.callText
         baseCall = component1;
         prefix = component0;
         setCallSignFlags(component1: component1, component2: "")
       
     // C#
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Numeric:
-      callStructureType = CallStructureType.CallDigit
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.numeric:
+      callStructureType = CallStructureType.callDigit
       setCallSignFlags(component1: component1, component2: "")
       
     // CM
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable:
-      callStructureType = CallStructureType.CallPortable
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.portable:
+      callStructureType = CallStructureType.callPortable
       setCallSignFlags(component1: component1, component2: "")
       
     // PU
-    case component0Type == ComponentType.Prefix && component1Type == ComponentType.Unknown:
-      callStructureType = CallStructureType.PrefixCall
+    case component0Type == ComponentType.prefix && component1Type == ComponentType.unknown:
+      callStructureType = CallStructureType.prefixCall
       baseCall = component1;
       prefix = component0;
       
     default:
-      callStructureType = CallStructureType.Call
       return
     }
   }
@@ -204,7 +195,7 @@ public class CallStructure {
     component1Type = getComponentType(candidate: component1, position: 2)
     component2Type = getComponentType(candidate: component2, position: 3)
     
-    if component0Type == ComponentType.Unknown || component1Type == ComponentType.Unknown {
+    if component0Type == ComponentType.unknown || component1Type == ComponentType.unknown {
       // this should probably be expanded
       resolveAmbiguities(componentType0: component0Type, componentType1: component1Type, component0Type: &component0Type, component1Type: &component1Type)
     }
@@ -217,72 +208,71 @@ public class CallStructure {
 
     switch true {
     // if all are invalid short cicuit all the checks and exit immediately
-    case component0Type == ComponentType.Invalid && component1Type == ComponentType.Invalid && component2Type == ComponentType.Invalid:
+    case component0Type == ComponentType.invalid && component1Type == ComponentType.invalid && component2Type == ComponentType.invalid:
       return
       
     // C#M
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Numeric && component2Type == ComponentType.Portable:
-      callStructureType = CallStructureType.CallDigitPortable
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.numeric && component2Type == ComponentType.portable:
+      callStructureType = CallStructureType.callDigitPortable
       setCallSignFlags(component1: component2, component2: "")
       
       
     // C#T
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Numeric && component2Type == ComponentType.Text:
-      callStructureType = CallStructureType.CallDigitText
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.numeric && component2Type == ComponentType.text:
+      callStructureType = CallStructureType.callDigitText
       setCallSignFlags(component1: component2, component2: "")
       
       
     // CMM
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable && component2Type == ComponentType.Portable:
-      callStructureType = CallStructureType.CallPortablePortable
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.portable && component2Type == ComponentType.portable:
+      callStructureType = CallStructureType.callPortablePortable
       setCallSignFlags(component1: component1, component2: "")
       
       
     // CMP
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable && component2Type == ComponentType.Prefix:
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.portable && component2Type == ComponentType.prefix:
       baseCall = component0
       prefix = component2
       suffix1 = component1
-      callStructureType = CallStructureType.CallPortablePrefix
+      callStructureType = CallStructureType.callPortablePrefix
       setCallSignFlags(component1: component1, component2: "")
       
       
     // CMT
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable && component2Type == ComponentType.Text:
-      callStructureType = CallStructureType.CallPortableText
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.portable && component2Type == ComponentType.text:
+      callStructureType = CallStructureType.callPortableText
       setCallSignFlags(component1: component1, component2: "")
       return;
       
     // CPM
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Prefix && component2Type == ComponentType.Portable:
-      callStructureType = CallStructureType.CallPrefixPortable
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.prefix && component2Type == ComponentType.portable:
+      callStructureType = CallStructureType.callPrefixPortable
       setCallSignFlags(component1: component2, component2: "")
       
       
     // PCM
-    case component0Type == ComponentType.Prefix && component1Type == ComponentType.CallSign && component2Type == ComponentType.Portable:
+    case component0Type == ComponentType.prefix && component1Type == ComponentType.callSign && component2Type == ComponentType.portable:
       baseCall = component1
       prefix = component0
       suffix1 = component2
-      callStructureType = CallStructureType.PrefixCallPortable
+      callStructureType = CallStructureType.prefixCallPortable
       
     // PCT
-    case component0Type == ComponentType.Prefix && component1Type == ComponentType.CallSign && component2Type == ComponentType.Text:
+    case component0Type == ComponentType.prefix && component1Type == ComponentType.callSign && component2Type == ComponentType.text:
       baseCall = component1
       prefix = component0
       suffix1 = component2
-      callStructureType = CallStructureType.PrefixCallText
+      callStructureType = CallStructureType.prefixCallText
       
       // CM#
-    case component0Type == ComponentType.CallSign && component1Type == ComponentType.Portable && component2Type == ComponentType.Numeric:
+    case component0Type == ComponentType.callSign && component1Type == ComponentType.portable && component2Type == ComponentType.numeric:
       baseCall = component0
       prefix = component2
       suffix1 = component1
       setCallSignFlags(component1: component2, component2: "")
-      callStructureType = CallStructureType.CallDigitPortable
+      callStructureType = CallStructureType.callDigitPortable
       
     default:
-      callStructureType = CallStructureType.Call
       return
     }
   }
@@ -294,102 +284,89 @@ public class CallStructure {
     
     switch component1 {
     case "R":
-      callSignFlags.append(CallSignFlags.Beacon)
+      callSignFlags.append(CallSignFlags.beacon)
       
       case "B":
-      callSignFlags.append(CallSignFlags.Beacon)
+      callSignFlags.append(CallSignFlags.beacon)
       
     case "P":
       if component2 == "QRP" {
-        callSignFlags.append(CallSignFlags.Qrp)
+        callSignFlags.append(CallSignFlags.qrp)
       }
-      callSignFlags.append(CallSignFlags.Portable)
+      callSignFlags.append(CallSignFlags.portable)
       
       case "QRP":
       if component2 == "P" {
-        callSignFlags.append(CallSignFlags.Portable)
+        callSignFlags.append(CallSignFlags.portable)
       }
-      callSignFlags.append(CallSignFlags.Qrp)
+      callSignFlags.append(CallSignFlags.qrp)
       
       case "M":
-      callSignFlags.append(CallSignFlags.Portable)
+      callSignFlags.append(CallSignFlags.portable)
       
     case "MM":
-      callSignFlags.append(CallSignFlags.Maritime)
+      callSignFlags.append(CallSignFlags.maritime)
       
     default:
-      callSignFlags.append(CallSignFlags.Portable)
+      callSignFlags.append(CallSignFlags.portable)
     }
   }
   
   /**
-   ///FStructure:= StringReplace(FStructure, 'UU', 'PC', [rfReplaceAll]);
+   FStructure:= StringReplace(FStructure, 'UU', 'PC', [rfReplaceAll]);
    
-   // I don't agree with these two
-   ///FStructure:= StringReplace(FStructure, 'CU', 'CP', [rfReplaceAll]);
-   ///FStructure:= StringReplace(FStructure, 'UC', 'PC', [rfReplaceAll]);
+    I don't agree with this one
+   FStructure:= StringReplace(FStructure, 'CU', 'CP', [rfReplaceAll]);
    
-   ///FStructure:= StringReplace(FStructure, 'UP', 'CP', [rfReplaceAll]);
-   ///FStructure:= StringReplace(FStructure, 'PU', 'PC', [rfReplaceAll]);
-   ///FStructure:= StringReplace(FStructure, 'U', 'C', [rfReplaceAll]);
+   FStructure:= StringReplace(FStructure, 'UC', 'PC', [rfReplaceAll]);
+   FStructure:= StringReplace(FStructure, 'UP', 'CP', [rfReplaceAll]);
+   FStructure:= StringReplace(FStructure, 'PU', 'PC', [rfReplaceAll]);
+   FStructure:= StringReplace(FStructure, 'U', 'C', [rfReplaceAll]);
    */
   func resolveAmbiguities(componentType0: ComponentType, componentType1: ComponentType, component0Type: inout ComponentType, component1Type: inout ComponentType){
    
     switch true {
     // UU --> PC
-    case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.Unknown:
-      component0Type = ComponentType.Prefix
-      component1Type = ComponentType.CallSign
+    case componentType0 == ComponentType.unknown && componentType1 == ComponentType.unknown:
+      component0Type = ComponentType.prefix
+      component1Type = ComponentType.callSign
       
-    // CU --> CP
-      // CU --> CI
-      case componentType0 == ComponentType.CallSign && componentType1 == ComponentType.Unknown:
-      component0Type = ComponentType.CallSign
-      component1Type = ComponentType.Invalid
-//    case componentType0 == ComponentType.CallSign && componentType1 ==    ComponentType.Unknown:
-//      component0Type = ComponentType.CallSign
-//      component1Type = ComponentType.Prefix
+    // CU --> CP - I don't agree with this --> CT
+    case componentType0 == ComponentType.callSign && componentType1 ==    ComponentType.unknown:
+       component0Type = ComponentType.callSign
+       component1Type = ComponentType.text
       
-    // UC --> PC
-      // UC --> IC
-      case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.CallSign:
-      component0Type = ComponentType.Invalid
-      component1Type = ComponentType.CallSign
-//    case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.CallSign:
-//      component0Type = ComponentType.Prefix
-//      component1Type = ComponentType.CallSign
+    // UC --> PC - I don't agree with this --> TC
+    case componentType0 == ComponentType.unknown && componentType1 == ComponentType.callSign:
+      component0Type = ComponentType.text
+      component1Type = ComponentType.callSign
       
     // UP --> CP
-    case componentType0 == ComponentType.Unknown && componentType1 == ComponentType.Prefix:
-      component0Type = ComponentType.CallSign
-      component1Type = ComponentType.Prefix
+    case componentType0 == ComponentType.unknown && componentType1 == ComponentType.prefix:
+      component0Type = ComponentType.callSign
+      component1Type = ComponentType.prefix
       
     // PU --> PC
-    case componentType0 == ComponentType.Prefix && componentType1 == ComponentType.Unknown:
-      component0Type = ComponentType.Prefix
-      component1Type = ComponentType.CallSign
+    case componentType0 == ComponentType.prefix && componentType1 == ComponentType.unknown:
+      component0Type = ComponentType.prefix
+      component1Type = ComponentType.callSign
       
     // U --> C
-    case componentType0 == ComponentType.Unknown:
-      component0Type = ComponentType.CallSign
+    case componentType0 == ComponentType.unknown:
+      component0Type = ComponentType.callSign
       component1Type = componentType1
       
     // U --> C
-    case componentType1 == ComponentType.Unknown:
-      component1Type = ComponentType.CallSign;
+    case componentType1 == ComponentType.unknown:
+      component1Type = ComponentType.callSign;
       component0Type = componentType0;
       
     default:
-      component0Type = ComponentType.Unknown
-      component1Type = ComponentType.Unknown
+      component0Type = ComponentType.unknown
+      component1Type = ComponentType.unknown
     }
 
   }
-  
-  /*
-     
-           
-   */
   
   /**
    one of "@","@@","#@","#@@" followed by 1-4 digits followed by 1-6 letters
@@ -400,65 +377,65 @@ public class CallStructure {
     
     let validPrefixes = ["@", "@@", "@@#", "@@#@", "@#", "@#@", "@##", "#@", "#@@", "#@#", "#@@#"]
     let validPrefixOrCall = ["@@#@", "@#@"]
-    var componentType = ComponentType.Unknown
+    var componentType = ComponentType.unknown
     
     let pattern = buildPattern(candidate: candidate)
     
     switch true {
       
     case position == 1 && candidate == "MM":
-      return ComponentType.Prefix
+      return ComponentType.prefix
     
     case position == 1 && candidate.count == 1:
       return verifyIfPrefix(candidate: candidate, position: position)
     
     case isSuffix(candidate: candidate):
-      return ComponentType.Portable
+      return ComponentType.portable
     
     case candidate.count == 1:
       if candidate.isInteger {
-        return ComponentType.Numeric
+        return ComponentType.numeric
       } else {
-        return ComponentType.Text
+        return ComponentType.text
       }
     
     case candidate.isAlphabetic:
       if candidate.count > 2 {
-        return ComponentType.Text
+        return ComponentType.text
       }
-      if verifyIfPrefix(candidate: candidate, position: position) == ComponentType.Prefix
+      if verifyIfPrefix(candidate: candidate, position: position) == ComponentType.prefix
       {
-        return ComponentType.Prefix;
+        return ComponentType.prefix;
       }
-      return ComponentType.Text;
+      return ComponentType.text;
       
       // this first case is somewhat redundant
     case validPrefixOrCall.contains(pattern):
-      if verifyIfPrefix(candidate: candidate, position: position) != ComponentType.Prefix
+      if verifyIfPrefix(candidate: candidate, position: position) != ComponentType.prefix
       {
-        return ComponentType.CallSign;
+        return ComponentType.callSign;
       } else {
-        if verifyIfCallSign(component: candidate) == ComponentType.CallSign {
-          componentType = ComponentType.Unknown
+        if verifyIfCallSign(component: candidate) == ComponentType.callSign {
+          componentType = ComponentType.unknown
         } else {
-          componentType = ComponentType.Prefix
+          componentType = ComponentType.prefix
         }
       }
       return componentType
       
-    case validPrefixes.contains(pattern) && verifyIfPrefix(candidate: candidate, position: position) == ComponentType.Prefix:
-      return ComponentType.Prefix
+    case validPrefixes.contains(pattern) && verifyIfPrefix(candidate: candidate, position: position) == ComponentType.prefix:
+      return ComponentType.prefix
       
-    case verifyIfCallSign(component: candidate) == ComponentType.CallSign:
-      return ComponentType.CallSign
+    case verifyIfCallSign(component: candidate) == ComponentType.callSign:
+      return ComponentType.callSign
       
     default:
       if candidate.isAlphabetic {
-        return ComponentType.Text
+        return ComponentType.text
       }
     }
     
-    return ComponentType.Unknown
+    return ComponentType.unknown
   }
   
   /**
@@ -501,19 +478,19 @@ public class CallStructure {
       digits += 1
       candidate.remove(at: candidate.startIndex)
       if candidate.count == 0 {
-        return ComponentType.Invalid
+        return ComponentType.invalid
       }
     }
     
     if digits > 0 && digits <= 4 {
       if candidate.count <= 6 {
         if candidate.rangeOfCharacter(from: CharacterSet.alphanumerics) != nil {
-          return ComponentType.CallSign // needs checking
+          return ComponentType.callSign // needs checking
         }
       }
     }
     
-    return ComponentType.Invalid
+    return ComponentType.invalid
   }
   
   /**
@@ -529,23 +506,23 @@ public class CallStructure {
       switch position {
       case 1:
         if singleCharacterPrefixes.contains(candidate){
-          return ComponentType.Prefix;
+          return ComponentType.prefix;
         }
         else {
-          return ComponentType.Text
+          return ComponentType.text
         }
       default:
-        return ComponentType.Text
+        return ComponentType.text
       }
     }
     
     if validprefixes.contains(pattern){
       if portablePrefixes[pattern + "/"] != nil {
-        return ComponentType.Prefix
+        return ComponentType.prefix
       }
     }
     
-    return ComponentType.Text;
+    return ComponentType.text;
   }
   
   /**
@@ -575,7 +552,7 @@ public class CallStructure {
       
       default:
         // should never default
-        print("hit default - buildPattern \(item) line 600")
+        print("hit default - \(candidate) buildPattern \(item) line 600")
       }
     }
       return pattern
