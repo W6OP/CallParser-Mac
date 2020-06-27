@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class CallStructure {
+public struct CallStructure {
   
   private var singleCharacterPrefixes: [String] = ["F", "G", "M", "I", "R", "W" ]
   
@@ -35,7 +35,7 @@ public class CallStructure {
   /**
    Split the call sign into indvidual componenets
    */
-  func splitCallSign(callSign: String) {
+  mutating func splitCallSign(callSign: String) {
     
     if callSign.components(separatedBy:"/").count > 3 {
       return
@@ -74,7 +74,7 @@ public class CallStructure {
   /**
    
    */
-  func analyzeComponents(components: [String]) {
+  mutating func analyzeComponents(components: [String]) {
     
     switch components.count {
     case 0:
@@ -101,7 +101,7 @@ public class CallStructure {
   /**
    
    */
-  func processComponents(component0: String, component1: String) {
+  mutating func processComponents(component0: String, component1: String) {
     
     //var componentType = ComponentType.Invalid
     var component0Type: ComponentType
@@ -185,7 +185,7 @@ public class CallStructure {
   /**
    
    */
-  func processComponents(component0: String, component1: String, component2: String) {
+  mutating func processComponents(component0: String, component1: String, component2: String) {
     
     var component0Type: ComponentType
     var component1Type: ComponentType
@@ -276,11 +276,11 @@ public class CallStructure {
       return
     }
   }
-  
+
   /**
    
    */
-  func setCallSignFlags(component1: String, component2: String){
+  mutating func setCallSignFlags(component1: String, component2: String){
     
     switch component1 {
     case "R":

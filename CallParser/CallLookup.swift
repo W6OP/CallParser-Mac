@@ -108,7 +108,7 @@ public class CallLookup: ObservableObject{
    */
   func lookupCallBatch(callList: [String]) -> [Hit] {
     
-         // var count = 0
+    var count = 0
     hitList = [Hit]()
     hitList.reserveCapacity(callList.count)
     prefixDataList = [Hit]()
@@ -118,10 +118,10 @@ public class CallLookup: ObservableObject{
       for call in callList {
         self.processCallSign(callSign: call.uppercased())
         //print(call)
-//        count += 1
-//        if count > 2000 {
-//          break
-//        }
+        count += 1
+        if count > 2000 {
+          break
+        }
       }
     //}
     
@@ -214,7 +214,7 @@ public class CallLookup: ObservableObject{
      */
   func collectMatches(callStructure: CallStructure) {
         
-      let callStructureType = callStructure.callStructureType
+    let callStructureType = callStructure.callStructureType
     
     switch (callStructureType) // GT3UCQ/P
     {
@@ -238,7 +238,7 @@ public class CallLookup: ObservableObject{
 
         case CallStructureType.callDigit:
           if checkReplaceCallArea(callStructure: callStructure) { return }
-        break
+      
         default:
             break
     }
@@ -255,7 +255,6 @@ public class CallLookup: ObservableObject{
    */
   func  searchMainDictionary(callStructure: CallStructure, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
-    //_ = callStructure.baseCall
     let prefix = callStructure.prefix
     
     var pattern: String
@@ -268,6 +267,7 @@ public class CallLookup: ObservableObject{
       || callStructure.callStructureType == CallStructureType.prefixCallText
       && prefix!.count == 1:
       
+      // TODO: ist this redundant, could I have saved it earlier?
       pattern = callStructure.buildPattern(candidate: callStructure.prefix)
       
     case callStructure.callStructureType == CallStructureType.prefixCall:
@@ -484,28 +484,30 @@ public class CallLookup: ObservableObject{
     let digits = callStructure.baseCall.onlyDigits
     var position = 0
     
-    
     // UY0KM/0 - prefix is single digit and same as call
     if callStructure.prefix == String(digits[0]) {
+      var callStructure = callStructure
       callStructure.callStructureType = CallStructureType.call
+      collectMatches(callStructure: callStructure);
       return true
     }
     
     // W6OP/4 will get replace by W4
       let found  = searchMainDictionary(callStructure: callStructure, saveHit: false)
       if found.result {
+        var callStructure = callStructure
         callStructure.prefix = replaceCallArea(mainPrefix: found.mainPrefix, prefix: callStructure.prefix, position: &position)
         
         switch callStructure.prefix {
           
         case "":
-          callStructure.callStructureType = CallStructureType.call;
+          callStructure.callStructureType = CallStructureType.call
           
         default:
-          callStructure.callStructureType = CallStructureType.prefixCall;
+          callStructure.callStructureType = CallStructureType.prefixCall
         }
         
-        collectMatches(callStructure: callStructure);
+        collectMatches(callStructure: callStructure)
         return true;
       }
     

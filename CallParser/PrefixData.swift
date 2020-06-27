@@ -291,31 +291,31 @@ public struct PrefixData: Hashable {
     var sixth: String
     
     
-    for item in maskList {
-      for mask in item where mask.count == call.count {
+    for item in maskList where item.count == call.count {
+      //for mask in item where item.count == call.count {
         // can I compare this with call???
-        let joined = mask.joined()
-        if joined == call {
-          return true
-        }
+//        let joined = item.joined()
+//        if joined == call {
+//          return true
+//        }
         
         switch call.count {
           
         case 2:
-          if mask[0] == String(first) && mask[1] == String(second) {
+          if item[0].contains(String(first)) && item[1].contains(String(second)) {
             return true
           }
           
         case 3:
           third = String(call[2])
-          if mask[0] == String(first) && mask[1] == String(second) && mask[2] == String(third){
+          if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)){
             return true
           }
           
         case 4:
           third = String(call[2])
           fourth = String(call[3])
-          if mask[0] == String(first) && mask[1] == String(second) && mask[2] == String(third) && mask[3] == String(fourth){
+          if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth)){
             return true
           }
           
@@ -323,7 +323,7 @@ public struct PrefixData: Hashable {
           third = String(call[2])
           fourth = String(call[3])
           fifth = String(call[4])
-          if mask[0] == String(first) && mask[1] == String(second) && mask[2] == String(third) && mask[3] == String(fourth)  && mask[4] == String(fifth){
+          if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth))  && item[4].contains(String(fifth)){
             return true
           }
           
@@ -332,14 +332,14 @@ public struct PrefixData: Hashable {
           fourth = String(call[3])
           fifth = String(call[4])
           sixth = String(call[5])
-          if mask[0] == String(first) && mask[1] == String(second) && mask[2] == String(third) && mask[3] == String(fourth)  && mask[4] == String(fifth) && mask[5] == String(sixth){
+          if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth))  && item[4].contains(String(fifth)) && item[5].contains(String(sixth)){
             return true
           }
           
         default:
           break
         }
-      }
+      //}
     }
     
     return false

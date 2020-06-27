@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9910962924A011750092D9EA /* pskreporter.csv in Resources */ = {isa = PBXBuildFile; fileRef = 9910962824A011750092D9EA /* pskreporter.csv */; };
 		9944C39124951BCB004B8C7F /* CallStructure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9944C39024951BCB004B8C7F /* CallStructure.swift */; };
 		9944C39324951E1C004B8C7F /* CallParserCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9944C39224951E1C004B8C7F /* CallParserCommon.swift */; };
-		998807EF249FAD83002D6BB4 /* compound.csv in Resources */ = {isa = PBXBuildFile; fileRef = 998807EE249FAD83002D6BB4 /* compound.csv */; };
+		99611A0424A6C93A00E96FF2 /* compound.csv in Resources */ = {isa = PBXBuildFile; fileRef = 99611A0224A6C93900E96FF2 /* compound.csv */; };
+		99611A0524A6C93A00E96FF2 /* pskreporter.csv in Resources */ = {isa = PBXBuildFile; fileRef = 99611A0324A6C93A00E96FF2 /* pskreporter.csv */; };
 		998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */ = {isa = PBXBuildFile; fileRef = 998A91A6248C10BC004C21E5 /* PrefixList.xml */; };
 		998A91A9248C1179004C21E5 /* PrefixFileParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91A8248C1179004C21E5 /* PrefixFileParser.swift */; };
 		998A91AB248C11B6004C21E5 /* XmlParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91AA248C11B6004C21E5 /* XmlParser.swift */; };
@@ -20,10 +20,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		9910962824A011750092D9EA /* pskreporter.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = pskreporter.csv; path = ../../../../Downloads/pskreporter.csv; sourceTree = "<group>"; };
 		9944C39024951BCB004B8C7F /* CallStructure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallStructure.swift; sourceTree = "<group>"; };
 		9944C39224951E1C004B8C7F /* CallParserCommon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallParserCommon.swift; sourceTree = "<group>"; };
-		998807EE249FAD83002D6BB4 /* compound.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = compound.csv; path = ../../../../Downloads/compound.csv; sourceTree = "<group>"; };
+		99611A0224A6C93900E96FF2 /* compound.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = compound.csv; sourceTree = "<group>"; };
+		99611A0324A6C93A00E96FF2 /* pskreporter.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = pskreporter.csv; sourceTree = "<group>"; };
 		998A91A6248C10BC004C21E5 /* PrefixList.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrefixList.xml; sourceTree = "<group>"; };
 		998A91A8248C1179004C21E5 /* PrefixFileParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrefixFileParser.swift; sourceTree = "<group>"; };
 		998A91AA248C11B6004C21E5 /* XmlParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XmlParser.swift; sourceTree = "<group>"; };
@@ -48,8 +48,8 @@
 		998A91A5248C105E004C21E5 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
-				9910962824A011750092D9EA /* pskreporter.csv */,
-				998807EE249FAD83002D6BB4 /* compound.csv */,
+				99611A0224A6C93900E96FF2 /* compound.csv */,
+				99611A0324A6C93A00E96FF2 /* pskreporter.csv */,
 				998A91A6248C10BC004C21E5 /* PrefixList.xml */,
 			);
 			path = "Support Files";
@@ -158,9 +158,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9910962924A011750092D9EA /* pskreporter.csv in Resources */,
+				99611A0524A6C93A00E96FF2 /* pskreporter.csv in Resources */,
 				998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */,
-				998807EF249FAD83002D6BB4 /* compound.csv in Resources */,
+				99611A0424A6C93A00E96FF2 /* compound.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
