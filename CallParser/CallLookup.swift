@@ -88,6 +88,12 @@ public class CallLookup: ObservableObject{
 
     }
     
+  public init() {
+    CallSignPatterns = [String: [PrefixData]]()
+    adifs = [Int : PrefixData]()
+    portablePrefixes = [String: [PrefixData]]()
+  }
+  
     /**
      Entry point for searching with a call sign.
      - parameters:
@@ -114,7 +120,7 @@ public class CallLookup: ObservableObject{
     prefixDataList = [Hit]()
     prefixDataList.reserveCapacity(callList.count)
     
-   // BG {
+    //BG {
       for call in callList {
         self.processCallSign(callSign: call.uppercased())
         //print(call)
@@ -127,8 +133,10 @@ public class CallLookup: ObservableObject{
     
 //    var temp = [Hit]()
     UI {
-      self.prefixDataList = Array(self.hitList.prefix(1000)) // .prefix(1000)
+      self.prefixDataList = Array(self.hitList) // .prefix(1000)
+      print ("Hit List: \(self.hitList.count) -- PrifixDataList: \(self.prefixDataList.count)")
     }
+    
     
     return prefixDataList
   }
@@ -201,7 +209,7 @@ public class CallLookup: ObservableObject{
       let callStructure = CallStructure(callSign: cleanedCall, portablePrefixes: portablePrefixes);
 
         if (callStructure.callStructureType != CallStructureType.invalid) {
-          collectMatches(callStructure: callStructure);
+            collectMatches(callStructure: callStructure);
        }
     }
     
