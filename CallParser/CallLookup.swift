@@ -68,7 +68,10 @@ public struct Hit: Identifiable, Hashable {
  */
 public class CallLookup: ObservableObject{
     
-    var hitList = [Hit]()
+  let queue = DispatchQueue(label: "com.w6op.calllookupqueue", qos: .userInitiated, attributes: .concurrent)
+    //let semaphore = DispatchSemaphore(value: 30)
+    
+  var hitList = [Hit]()
     @Published public var prefixDataList = [Hit]()
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
@@ -102,11 +105,15 @@ public class CallLookup: ObservableObject{
     public func lookupCall(call: String) -> [Hit] {
       
             hitList = [Hit]()
-            processCallSign(callSign: call.uppercased())
-     
-          prefixDataList = Array(self.hitList)
+      queue.async {
+        self.processCallSign(callSign: call.uppercased())
+      }
+      
+      UI{
+        self.prefixDataList = Array(self.hitList)
+      }
             
-      return prefixDataList
+      return hitList
     }
   
   /**
@@ -114,31 +121,46 @@ public class CallLookup: ObservableObject{
    */
   func lookupCallBatch(callList: [String]) -> [Hit] {
     
-    var count = 0
+    //var count = 0
     hitList = [Hit]()
     hitList.reserveCapacity(callList.count)
     prefixDataList = [Hit]()
     prefixDataList.reserveCapacity(callList.count)
     
-    //BG {
-      for call in callList {
-        self.processCallSign(callSign: call.uppercased())
-        //print(call)
-        count += 1
-        if count > 2000 {
-          break
-        }
+    DispatchQueue.global(qos: .userInitiated).sync {
+      DispatchQueue.concurrentPerform(iterations: callList.count - 1) { index in
+      self.processCallSign(callSign: callList[index].uppercased())
       }
-    //}
+    }
     
-//    var temp = [Hit]()
+    // -------------------------------------------------------------------------
+    // let _ =  DispatchQueue.concurrentPerform(iterations: callList.count - 1, execute: { index in
+    //      //print("testConcurrence thread=\(Thread.current)")
+    //      self.processCallSign(callSign: callList[index].uppercased())
+    //
+    //      })
+    // -------------------------------------------------------------------------
+    
+    // -------------------------------------------------------------------------
+    //      for call in callList {
+    //        queue.async {
+    //        self.processCallSign(callSign: call.uppercased())
+    //        self.semaphore.signal()
+    //      }
+    //        semaphore.wait()
+    //        count += 1
+    //         if count > 3000 {
+    //           break
+    //         }
+    //    }
+    // -------------------------------------------------------------------------
+    
     UI {
-      self.prefixDataList = Array(self.hitList) // .prefix(1000)
+      self.prefixDataList = Array(self.hitList.prefix(2000)) // .prefix(1000)
       print ("Hit List: \(self.hitList.count) -- PrifixDataList: \(self.prefixDataList.count)")
     }
     
-    
-    return prefixDataList
+    return hitList
   }
   
   /**
@@ -150,26 +172,25 @@ public class CallLookup: ObservableObject{
     
     let bundle = Bundle(identifier: "com.w6op.CallParser")
     guard let url = bundle!.url(forResource: "pskreporter", withExtension: "csv") else {
-        print("Invalid prefix file: ")
-        return [Hit]()
-        // later make this throw
+      print("Invalid prefix file: ")
+      return [Hit]()
+      // later make this throw
+    }
+    do {
+      let contents = try String(contentsOf: url)
+      let text: [String] = contents.components(separatedBy: "\r\n")
+      print("Loaded: \(text.count)")
+      for callSign in text{
+        //print(callSign)
+        batch.append(callSign)
+        //try? print(lookupCall(call: callSign))
+      }
+    } catch {
+      // contents could not be loaded
+      print("Invalid compund file: ")
     }
     
-        do {
-          let contents = try String(contentsOf: url)
-          let text: [String] = contents.components(separatedBy: "\r\n")
-          print("Loaded: \(text.count)")
-          for callSign in text{
-            //print(callSign)
-            batch.append(callSign)
-            //try? print(lookupCall(call: callSign))
-          }
-        } catch {
-            // contents could not be loaded
-          print("Invalid compund file: ")
-        }
-    
-        return lookupCallBatch(callList: batch)
+    return lookupCallBatch(callList: batch)
     
   }
   
@@ -209,7 +230,9 @@ public class CallLookup: ObservableObject{
       let callStructure = CallStructure(callSign: cleanedCall, portablePrefixes: portablePrefixes);
 
         if (callStructure.callStructureType != CallStructureType.invalid) {
-            collectMatches(callStructure: callStructure);
+          //BG{
+            self.collectMatches(callStructure: callStructure)
+          //}
        }
     }
     
@@ -475,10 +498,17 @@ public class CallLookup: ObservableObject{
       return prefixData0.rank < prefixData1.rank
     })
     
+    //https://rbnsn.me/multi-core-array-operations-in-swift
+    //    sortedItems.concurrentForEach {prefixData in
+    //      let hit = Hit(callSign: fullCall, prefixData: prefixData)
+    //      self.hitList.append(hit)
+    //    }
+    
     for prefixData in sortedItems {
       let hit = Hit(callSign: fullCall, prefixData: prefixData)
-      
-      hitList.append(hit)
+      queue.async(flags: .barrier) {
+        self.hitList.append(hit)
+      }
     }
   }
  

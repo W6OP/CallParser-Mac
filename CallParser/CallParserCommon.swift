@@ -324,31 +324,24 @@ extension String {
 //    }
 }
 
-//extension Substring {
-//    subscript (i: Int) -> Character {
-//        return self[index(startIndex, offsetBy: i)]
+// https://rbnsn.me/multi-core-array-operations-in-swift
+//public extension Array {
+//    /// Synchronous
+//    func concurrentMap<T>(transform: @escaping (Element) -> T) -> [T] {
+//        let result = UnsafeMutablePointer<T>.allocate(capacity: count)
+//
+//        DispatchQueue.concurrentPerform(iterations: count) { i in
+//            result.advanced(by: i).initialize(to: transform(self[i]))
+//        }
+//
+//        let finalResult = Array<T>(UnsafeBufferPointer(start: result, count: count))
+//        result.deallocate()
+//
+//        return finalResult
 //    }
-//    subscript (bounds: CountableRange<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        return self[start ..< end]
-//    }
-//    subscript (bounds: CountableClosedRange<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        return self[start ... end]
-//    }
-//    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(endIndex, offsetBy: -1)
-//        return self[start ... end]
-//    }
-//    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        return self[startIndex ... end]
-//    }
-//    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        return self[startIndex ..< end]
+//
+//    /// Synchronous
+//    func concurrentForEach(action: @escaping (Element) -> Void) {
+//        _ = concurrentMap { _ = action($0) }
 //    }
 //}
