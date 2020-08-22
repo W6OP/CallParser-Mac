@@ -43,6 +43,11 @@ public struct CallStructure {
     
     let components = callSign.components(separatedBy:"/")
     
+    if components.contains("") {
+      _=1
+    }
+    
+    //components.forEach { // slower
     for item in components {
       if getComponentType(callSign: item) == StringTypes.invalid {
         return
@@ -50,7 +55,6 @@ public struct CallStructure {
     }
     
     analyzeComponents(components: components);
-    
   }
   
   /*/
@@ -381,6 +385,10 @@ public struct CallStructure {
     
     let pattern = buildPattern(candidate: candidate)
     
+    if pattern.isEmpty {
+      return ComponentType.unknown
+    }
+    
     switch true {
       
     case position == 1 && candidate == "MM":
@@ -451,23 +459,24 @@ public struct CallStructure {
    */
   func verifyIfCallSign(component: String) -> ComponentType {
     
-    let test = true
-    var candidate = component
-    let first = candidate[0]
-    let second = candidate[1]
-    var range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 1)
+    let first = component[0]
+    let second = component[1]
+    var range = component.startIndex...component.index(component.startIndex, offsetBy: 1)
     
-    switch test {
+    var candidate = component
+    
+    switch true {
     case first.isLetter && second.isLetter: // "@@"
       candidate.removeSubrange(range)
     case first.isLetter: // "@"
       candidate.remove(at: candidate.startIndex)
+      case String(first).isInteger && second.isLetter: // "#@"
+      range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 1)
+      candidate.removeSubrange(range)
     case String(first).isInteger && second.isLetter && candidate[2].isLetter: //"#@@"
       range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 2)
       candidate.removeSubrange(range)
-    case String(first).isInteger && second.isLetter: // "#@"
-      range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 1)
-      candidate.removeSubrange(range)
+    
     default:
       break
     }
@@ -535,26 +544,40 @@ public struct CallStructure {
   func buildPattern(candidate: String)-> String {
     var pattern = ""
     
-    for item in candidate {
-      switch true {
-        
-      case String(item).isInteger:
-        pattern += "#"
-        
-      case String(item).isAlphabetic:
-        pattern += "@"
-        
-      case item == "/":
-        pattern += "/"
-        
-      case item == ".":
-        pattern += "."
-      
-      default:
-        // should never default
-        print("hit default - \(candidate) buildPattern \(item) line 600")
-      }
+    // with 1371294 iterations this is 10 seconds faster than the code below
+    candidate.forEach {
+
+        if ($0.isNumber) {
+            pattern += "#"
+        }
+        else if ($0.isLetter)  {
+            pattern += "@"
+        }
+        else {
+            pattern += String($0)
+        }
     }
+    
+//    for item in candidate {
+//      switch true {
+//
+//      case String(item).isAlphabetic:
+//        pattern += "@"
+//
+//      case String(item).isInteger:
+//        pattern += "#"
+//
+//      case item == "/":
+//        pattern += "/"
+//
+//      case item == ".":
+//        pattern += "."
+//
+//      default:
+//        // should never default
+//        print("hit default - \(candidate) buildPattern \(item) line 600")
+//      }
+//    }
       return pattern
   }
 

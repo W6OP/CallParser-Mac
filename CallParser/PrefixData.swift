@@ -89,6 +89,7 @@ public struct PrefixData: Hashable {
    */
   func maskExists(call: String, length: Int) -> Bool {
     
+    // slices
     let subCall = call[0...length - 1]
     let first = String(subCall[0])
     let second = String(subCall[1])
@@ -99,10 +100,8 @@ public struct PrefixData: Hashable {
     var sixth: String
     var seventh: String
     
-    // maskList = Set<[[String]]>
-    // item = [[String]]
     for item in maskList {
-      //for mask in item {
+     
         let searchLength = min(length, item.count)
         
         switch searchLength {
@@ -167,7 +166,7 @@ public struct PrefixData: Hashable {
         default:
           break
         }
-      //}
+
     }
     
     return false

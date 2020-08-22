@@ -75,7 +75,7 @@ public class CallLookup: ObservableObject{
     @Published public var prefixDataList = [Hit]()
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
-    var CallSignPatterns: [String: [PrefixData]]
+    var callSignPatterns: [String: [PrefixData]]
     var portablePrefixes: [String: [PrefixData]]
 
     /**
@@ -85,14 +85,14 @@ public class CallLookup: ObservableObject{
      */
     public init(prefixFileParser: PrefixFileParser) {
 
-       CallSignPatterns = prefixFileParser.callSignPatterns;
+       callSignPatterns = prefixFileParser.callSignPatterns;
        adifs = prefixFileParser.adifs;
        portablePrefixes = prefixFileParser.portablePrefixes;
 
     }
     
   public init() {
-    CallSignPatterns = [String: [PrefixData]]()
+    callSignPatterns = [String: [PrefixData]]()
     adifs = [Int : PrefixData]()
     portablePrefixes = [String: [PrefixData]]()
   }
@@ -127,33 +127,16 @@ public class CallLookup: ObservableObject{
     prefixDataList = [Hit]()
     prefixDataList.reserveCapacity(callList.count)
     
+    let start = CFAbsoluteTimeGetCurrent()
+    
     DispatchQueue.global(qos: .userInitiated).sync {
       DispatchQueue.concurrentPerform(iterations: callList.count - 1) { index in
-      self.processCallSign(callSign: callList[index].uppercased())
+      self.processCallSign(callSign: callList[index])
       }
     }
     
-    // -------------------------------------------------------------------------
-    // let _ =  DispatchQueue.concurrentPerform(iterations: callList.count - 1, execute: { index in
-    //      //print("testConcurrence thread=\(Thread.current)")
-    //      self.processCallSign(callSign: callList[index].uppercased())
-    //
-    //      })
-    // -------------------------------------------------------------------------
-    
-    // -------------------------------------------------------------------------
-    //      for call in callList {
-    //        queue.async {
-    //        self.processCallSign(callSign: call.uppercased())
-    //        self.semaphore.signal()
-    //      }
-    //        semaphore.wait()
-    //        count += 1
-    //         if count > 3000 {
-    //           break
-    //         }
-    //    }
-    // -------------------------------------------------------------------------
+    let diff = CFAbsoluteTimeGetCurrent() - start
+    print("Took \(diff) seconds")
     
     UI {
       self.prefixDataList = Array(self.hitList.prefix(2000)) // .prefix(1000)
@@ -182,8 +165,7 @@ public class CallLookup: ObservableObject{
       print("Loaded: \(text.count)")
       for callSign in text{
         //print(callSign)
-        batch.append(callSign)
-        //try? print(lookupCall(call: callSign))
+        batch.append(callSign.uppercased())
       }
     } catch {
       // contents could not be loaded
@@ -226,13 +208,18 @@ public class CallLookup: ObservableObject{
         cleanedCall = String(cleanedCall.prefix(cleanedCall.count - 1))
       }
       
-
+      if callSign.contains("//") { // EB5KB//P
+        cleanedCall = callSign.replacingOccurrences(of: "//", with: "/")
+      }
+      
+      if callSign.contains("///") { // BU1H8///D
+        cleanedCall = callSign.replacingOccurrences(of: "///", with: "/")
+      }
+      
       let callStructure = CallStructure(callSign: cleanedCall, portablePrefixes: portablePrefixes);
 
         if (callStructure.callStructureType != CallStructureType.invalid) {
-          //BG{
             self.collectMatches(callStructure: callStructure)
-          //}
        }
     }
     
@@ -346,10 +333,13 @@ public class CallLookup: ObservableObject{
     
     while (pattern.count > 1)
     {
-      if let valuesExists = CallSignPatterns[pattern] {
+      if let valuesExists = callSignPatterns[pattern] {
+        // slower even though it makes the loop much shorter
+      //?.all(where: {$0.indexKey.contains(firstLetter)}) {
+        
         temp = Set<PrefixData>()
+
         for prefixData in valuesExists {
-    
           if prefixData.indexKey.contains(firstLetter) {
             if pattern.last == "." {
               if prefixData.maskExists(call: searchTerm, length: pattern.count - 1) {

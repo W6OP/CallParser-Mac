@@ -132,50 +132,12 @@ public class PrefixFileParser: NSObject, ObservableObject {
   
   /**
    Build the pattern from the mask
-   AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ]
-   The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
-   */
-//  func buildPatternOld(primaryMaskList: [[String]]) {
-//    var pattern = ""
-//    var patternList = [String]()
-//
-//    for maskPart in primaryMaskList {
-//      if maskPart.allSatisfy({$0.isInteger}){
-//        pattern += "#"
-//      } else if maskPart.allSatisfy({!$0.isInteger}){
-//        switch maskPart[0] {
-//        case "/":
-//          pattern += "/"
-//        case ".":
-//          pattern += "."
-//        default:
-//          pattern += "@"
-//        }
-//      } else { // "?"
-//        pattern += "?"
-//      }
-//    }
-//
-//    if pattern.contains("?") {
-//      // # @  - only one (invalid prefix) has two ?  -- @# @@
-//      patternList.append(pattern.replacingOccurrences(of: "?", with: "#"))
-//      patternList.append(pattern.replacingOccurrences(of: "?", with: "@"))
-//      savePatternList(patternList: patternList)
-//      return
-//    }
-//
-//    patternList.append(pattern)
-//    savePatternList(patternList: patternList)
-//  }
-  
-  /**
-   Build the pattern from the mask
    KG4@@.
    [AKNW]H7K[./]
    AX9[ABD-KOPQS-VYZ][.ABD-KOPQS-VYZ] @@#@. and @@#@@.
    The [.A-KOPQS-VYZ] mask for the second letter of the suffix means that the call should either end there (no second letter) or be one of the listed letters.
    */
-  func buildPattern(primaryMaskList: [[String]]) {
+  func buildMaskPattern(primaryMaskList: [[String]]) {
     var pattern = ""
     var patternList = [String]()
     

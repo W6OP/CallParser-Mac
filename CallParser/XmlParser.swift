@@ -132,7 +132,7 @@ extension PrefixFileParser: XMLParserDelegate {
       for currentValue in prefixData.tempMaskList {
         let expandedMaskList = expandMask(element: currentValue)
         prefixData.setPrimaryMaskList(value: expandedMaskList)
-        buildPattern(primaryMaskList: expandedMaskList)
+        buildMaskPattern(primaryMaskList: expandedMaskList)
 //        if prefixData.country == "Indonesia"{
 //          print(currentValue)
 //          buildPattern(primaryMaskList: expandedMaskList)
