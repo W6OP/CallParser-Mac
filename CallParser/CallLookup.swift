@@ -71,7 +71,9 @@ public class CallLookup: ObservableObject{
   let queue = DispatchQueue(label: "com.w6op.calllookupqueue", qos: .userInitiated, attributes: .concurrent)
     //let semaphore = DispatchSemaphore(value: 30)
     
-  var hitList = [Hit]()
+    var hitList = [Hit]()
+    var callSignList = [String]()
+  
     @Published public var prefixDataList = [Hit]()
     var adifs: [Int : PrefixData]
     var prefixList = [PrefixData]()
@@ -145,18 +147,18 @@ public class CallLookup: ObservableObject{
     
     return hitList
   }
-  
+
   /**
    Load the compound call file for testing.
    - parameters:
    */
-  public func loadCompoundFile() -> [Hit] {
-    var batch = [String]()
+  public func loadCompoundFile() {
+    //var batch = [String]()
     
     let bundle = Bundle(identifier: "com.w6op.CallParser")
     guard let url = bundle!.url(forResource: "pskreporter", withExtension: "csv") else {
       print("Invalid prefix file: ")
-      return [Hit]()
+      return
       // later make this throw
     }
     do {
@@ -165,14 +167,14 @@ public class CallLookup: ObservableObject{
       print("Loaded: \(text.count)")
       for callSign in text{
         //print(callSign)
-        batch.append(callSign.uppercased())
+        callSignList.append(callSign.uppercased())
       }
     } catch {
       // contents could not be loaded
       print("Invalid compund file: ")
     }
     
-    return lookupCallBatch(callList: batch)
+    //return lookupCallBatch(callList: callSignList)
     
   }
   
@@ -180,8 +182,9 @@ public class CallLookup: ObservableObject{
   Run the batch job with the compound call file.
   - parameters:
   */
-  public func runBatchJob() {
+  public func runBatchJob()  -> [Hit] {
     
+    return lookupCallBatch(callList: callSignList)
   }
     
     /**
