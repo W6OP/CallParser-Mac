@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import OSLog
 
 public struct Hit: Identifiable, Hashable {
   
@@ -69,6 +70,7 @@ public struct Hit: Identifiable, Hashable {
 public class CallLookup: ObservableObject{
     
   let queue = DispatchQueue(label: "com.w6op.calllookupqueue", qos: .userInitiated, attributes: .concurrent)
+  let batchQueue = DispatchQueue(label: "com.w6op.batchlookupqueue", qos: .utility, attributes: .concurrent)
     //let semaphore = DispatchSemaphore(value: 30)
     
     var hitList = [Hit]()
@@ -79,6 +81,8 @@ public class CallLookup: ObservableObject{
     var prefixList = [PrefixData]()
     var callSignPatterns: [String: [PrefixData]]
     var portablePrefixes: [String: [PrefixData]]
+  
+    private let pointsOfInterest = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: .pointsOfInterest)
 
     /**
      Initialization.
@@ -119,11 +123,19 @@ public class CallLookup: ObservableObject{
     }
   
   /**
+   Run the batch job with the compound call file.
+   - parameters:
+   */
+   public func runBatchJob()  -> [Hit] {
+       return lookupCallBatch(callList: callSignList)
+   }
+     
+  
+  /**
    
    */
   func lookupCallBatch(callList: [String]) -> [Hit] {
     
-    //var count = 0
     hitList = [Hit]()
     hitList.reserveCapacity(callList.count)
     prefixDataList = [Hit]()
@@ -131,11 +143,11 @@ public class CallLookup: ObservableObject{
     
     let start = CFAbsoluteTimeGetCurrent()
     
-    DispatchQueue.global(qos: .userInitiated).sync {
+    //batchQueue.sync {
       DispatchQueue.concurrentPerform(iterations: callList.count - 1) { index in
       self.processCallSign(callSign: callList[index])
       }
-    }
+    //}
     
     let diff = CFAbsoluteTimeGetCurrent() - start
     print("Took \(diff) seconds")
@@ -173,20 +185,9 @@ public class CallLookup: ObservableObject{
       // contents could not be loaded
       print("Invalid compund file: ")
     }
-    
-    //return lookupCallBatch(callList: callSignList)
-    
   }
   
-  /**
-  Run the batch job with the compound call file.
-  - parameters:
-  */
-  public func runBatchJob()  -> [Hit] {
-    
-    return lookupCallBatch(callList: callSignList)
-  }
-    
+ 
     /**
      Process a call sign into its component parts ie: W6OP/V31
      - parameters:
@@ -237,6 +238,11 @@ public class CallLookup: ObservableObject{
         
     let callStructureType = callStructure.callStructureType
     
+//    os_signpost(.begin, log: pointsOfInterest, name: "collectMatches start")
+//    defer {
+//      os_signpost(.end, log: pointsOfInterest, name: "collectMatches end")
+//    }
+    
     switch (callStructureType) // GT3UCQ/P
     {
         case CallStructureType.callPrefix:
@@ -281,6 +287,11 @@ public class CallLookup: ObservableObject{
     var pattern: String
     var searchBy = SearchBy.prefix
     
+//    os_signpost(.begin, log: pointsOfInterest, name: "searchMainDictionary start")
+//    defer {
+//      os_signpost(.end, log: pointsOfInterest, name: "searchMainDictionary end")
+//    }
+    
     switch (true) {
       
     case callStructure.callStructureType == CallStructureType.prefixCall
@@ -320,6 +331,11 @@ public class CallLookup: ObservableObject{
     var list = Set<PrefixData>()
     var firstLetter: Character
     var searchTerm = ""
+    
+//    os_signpost(.begin, log: pointsOfInterest, name: "performSearch start")
+//       defer {
+//         os_signpost(.end, log: pointsOfInterest, name: "performSearch end")
+//       }
     
     switch searchBy {
     case .call:
@@ -380,6 +396,12 @@ public class CallLookup: ObservableObject{
     var nextLetter: String = ""
     let baseCall = callStructure.baseCall
     var foundItems =  Set<PrefixData>()
+    
+//    os_signpost(.begin, log: pointsOfInterest, name: "refineHits start")
+//    defer {
+//      os_signpost(.end, log: pointsOfInterest, name: "refineHits end")
+//    }
+    
     
     switch searchBy {
     case .call:
@@ -457,6 +479,11 @@ public class CallLookup: ObservableObject{
     
     if let query = portablePrefixes[pattern] {
       
+//      os_signpost(.begin, log: pointsOfInterest, name: "checkForPortablePrefix start")
+//      defer {
+//        os_signpost(.end, log: pointsOfInterest, name: "checkForPortablePrefix end")
+//      }
+      
       for prefixData in query {
         temp.removeAll()
         if prefixData.indexKey.contains(firstLetter) {
@@ -491,6 +518,11 @@ public class CallLookup: ObservableObject{
       return prefixData0.rank < prefixData1.rank
     })
     
+//    os_signpost(.begin, log: pointsOfInterest, name: "buildHit start")
+//    defer {
+//      os_signpost(.end, log: pointsOfInterest, name: "buildHit end")
+//    }
+    
     //https://rbnsn.me/multi-core-array-operations-in-swift
     //    sortedItems.concurrentForEach {prefixData in
     //      let hit = Hit(callSign: fullCall, prefixData: prefixData)
@@ -517,11 +549,22 @@ public class CallLookup: ObservableObject{
     
     // UY0KM/0 - prefix is single digit and same as call
     if callStructure.prefix == String(digits[0]) {
+     
+//      os_signpost(.begin, log: pointsOfInterest, name: "single digit checkReplaceCallArea")
+//      defer {
+//        os_signpost(.end, log: pointsOfInterest, name: "single digit checkReplaceCallArea")
+//      }
+      
       var callStructure = callStructure
       callStructure.callStructureType = CallStructureType.call
       collectMatches(callStructure: callStructure);
       return true
     }
+    
+//    os_signpost(.begin, log: pointsOfInterest, name: "searchMainDictionary checkReplaceCallArea")
+//         defer {
+//           os_signpost(.end, log: pointsOfInterest, name: "searchMainDictionary checkReplaceCallArea")
+//         }
     
     // W6OP/4 will get replace by W4
       let found  = searchMainDictionary(callStructure: callStructure, saveHit: false)

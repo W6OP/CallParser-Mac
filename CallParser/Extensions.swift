@@ -68,7 +68,7 @@ extension StringProtocol where Index == String.Index {
   func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
     range(of: string, options: options)?.upperBound
   }
- 
+
   // get substrings (slices) using a subscript or range
   // https://stackoverflow.com/questions/30018006/understanding-the-removerange-documentation
   subscript(_ offset: Int) -> Element { self[index(startIndex, offsetBy: offset)] }
@@ -81,23 +81,79 @@ extension StringProtocol where Index == String.Index {
 
 // MARK: - String Extensions
 
+//extension String {
+//
+//    var length: Int {
+//        return count
+//    }
+//
+//    subscript (i: Int) -> String {
+//        return self[i ..< i + 1]
+//    }
+//
+//    func substring(fromIndex: Int) -> String {
+//        return self[min(fromIndex, length) ..< length]
+//    }
+//
+//    func substring(toIndex: Int) -> String {
+//        return self[0 ..< max(0, toIndex)]
+//    }
+//
+//    subscript (r: Range<Int>) -> String {
+//        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+//                                            upper: min(length, max(0, r.upperBound))))
+//        let start = index(startIndex, offsetBy: range.lowerBound)
+//        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+//        return String(self[start ..< end])
+//    }
+//}
+
 // https://www.agnosticdev.com/content/how-get-first-or-last-characters-string-swift-4
 // Build your own String Extension for grabbing a character at a specific position
 // usage if let character = str.character(at: 3)
 // nil returned if value to large for string
 extension String {
   
-  func index(at position: Int, from start: Index? = nil) -> Index? {
-    let startingIndex = start ?? startIndex
-    return index(startingIndex, offsetBy: position, limitedBy: endIndex)
-  }
+//  func index(at position: Int, from start: Index? = nil) -> Index? {
+//    let startingIndex = start ?? startIndex
+//    return index(startingIndex, offsetBy: position, limitedBy: endIndex)
+//  }
+//
+//  func character(at position: Int) -> String? {
+//    guard position >= 0 && position <= self.count - 1, let indexPosition = index(at: position) else {
+//      return nil
+//    }
+//    return String(self[indexPosition])
+//  }
   
-  func character(at position: Int) -> String? {
-    guard position >= 0 && position <= self.count - 1, let indexPosition = index(at: position) else {
-      return nil
-    }
-    return String(self[indexPosition])
-  }
+  // ----------------------
+  
+//      var length: Int {
+//          return count
+//      }
+//  
+//      subscript (i: Int) -> String {
+//          return self[i ..< i + 1]
+//      }
+//  
+//      func substring(fromIndex: Int) -> String {
+//          return self[min(fromIndex, length) ..< length]
+//      }
+//  
+//      func substring(toIndex: Int) -> String {
+//          return self[0 ..< max(0, toIndex)]
+//      }
+//  
+//      subscript (r: Range<Int>) -> String {
+//          let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+//                                              upper: min(length, max(0, r.upperBound))))
+//          let start = index(startIndex, offsetBy: range.lowerBound)
+//          let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+//          return String(self[start ..< end])
+//      }
+  
+  
+  // -------------------
   
   // test if a character is an int
   var isInteger: Bool {
@@ -124,20 +180,20 @@ extension String {
   // https://stackoverflow.com/questions/29971505/filter-non-digits-from-string
   var onlyDigits: String { return onlyCharacters(charSets: [.decimalDigits]) }
   var onlyLetters: String { return onlyCharacters(charSets: [.letters]) }
-  
+
   private func filterCharacters(unicodeScalarsFilter closure: (UnicodeScalar) -> Bool) -> String {
     return String(String.UnicodeScalarView(unicodeScalars.filter { closure($0) }))
   }
-  
+
   private func filterCharacters(definedIn charSets: [CharacterSet], unicodeScalarsFilter: (CharacterSet, UnicodeScalar) -> Bool) -> String {
     if charSets.isEmpty { return self }
     let charSet = charSets.reduce(CharacterSet()) { return $0.union($1) }
     return filterCharacters { unicodeScalarsFilter(charSet, $0) }
   }
-  
+
   func removeCharacters(charSets: [CharacterSet]) -> String { return filterCharacters(definedIn: charSets) { !$0.contains($1) } }
   func removeCharacters(charSet: CharacterSet) -> String { return removeCharacters(charSets: [charSet]) }
-  
+
   func onlyCharacters(charSets: [CharacterSet]) -> String { return filterCharacters(definedIn: charSets) { $0.contains($1) } }
   func onlyCharacters(charSet: CharacterSet) -> String { return onlyCharacters(charSets: [charSet]) }
 }
