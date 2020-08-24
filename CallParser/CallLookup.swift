@@ -329,7 +329,7 @@ public class CallLookup: ObservableObject{
     var pattern = candidate + "."
     var temp = Set<PrefixData>()
     var list = Set<PrefixData>()
-    var firstLetter: Character
+    var firstLetter: String
     var searchTerm = ""
     
 //    os_signpost(.begin, log: pointsOfInterest, name: "performSearch start")
@@ -392,7 +392,7 @@ public class CallLookup: ObservableObject{
   */
   func refineHits(list: Set<PrefixData>, callStructure: CallStructure, searchBy: SearchBy, saveHit: Bool) -> (mainPrefix: String, result: Bool) {
      
-    var firstLetter: Character
+    var firstLetter: String
     var nextLetter: String = ""
     let baseCall = callStructure.baseCall
     var foundItems =  Set<PrefixData>()
@@ -594,8 +594,8 @@ public class CallLookup: ObservableObject{
    */
   func replaceCallArea(mainPrefix: String, prefix: String,  position: inout Int) -> String{
     
-    let oneCharPrefixes: [Character] = ["I", "K", "N", "W", "R", "U"]
-    let XNUM_SET: [Character] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "#", "["]
+    let oneCharPrefixes: [String] = ["I", "K", "N", "W", "R", "U"]
+    let XNUM_SET: [String] = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "#", "["]
   
     switch mainPrefix.count {
     case 1:

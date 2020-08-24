@@ -466,14 +466,14 @@ public struct CallStructure {
     var candidate = component
     
     switch true {
-    case first.isLetter && second.isLetter: // "@@"
+    case first.isAlphabetic && second.isAlphabetic: // "@@"
       candidate.removeSubrange(range)
-    case first.isLetter: // "@"
+    case first.isAlphabetic: // "@"
       candidate.remove(at: candidate.startIndex)
-      case String(first).isInteger && second.isLetter: // "#@"
+      case String(first).isInteger && second.isAlphabetic: // "#@"
       range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 1)
       candidate.removeSubrange(range)
-    case String(first).isInteger && second.isLetter && candidate[2].isLetter: //"#@@"
+    case String(first).isInteger && second.isAlphabetic && candidate[2].isAlphabetic: //"#@@"
       range = candidate.startIndex...candidate.index(candidate.startIndex, offsetBy: 2)
       candidate.removeSubrange(range)
     

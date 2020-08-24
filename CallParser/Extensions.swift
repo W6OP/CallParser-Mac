@@ -68,15 +68,15 @@ extension StringProtocol where Index == String.Index {
   func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
     range(of: string, options: options)?.upperBound
   }
-
-  // get substrings (slices) using a subscript or range
-  // https://stackoverflow.com/questions/30018006/understanding-the-removerange-documentation
-  subscript(_ offset: Int) -> Element { self[index(startIndex, offsetBy: offset)] }
-  subscript(_ range: Range<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
-  subscript(_ range: ClosedRange<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
-  subscript(_ range: PartialRangeThrough<Int>) -> SubSequence { prefix(range.upperBound.advanced(by: 1)) }
-  subscript(_ range: PartialRangeUpTo<Int>) -> SubSequence { prefix(range.upperBound) }
-  subscript(_ range: PartialRangeFrom<Int>) -> SubSequence { suffix(Swift.max(0, count-range.lowerBound)) }
+//
+//  // get substrings (slices) using a subscript or range
+//  // https://stackoverflow.com/questions/30018006/understanding-the-removerange-documentation
+//  subscript(_ offset: Int) -> Element { self[index(startIndex, offsetBy: offset)] }
+//  subscript(_ range: Range<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
+//  subscript(_ range: ClosedRange<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
+//  subscript(_ range: PartialRangeThrough<Int>) -> SubSequence { prefix(range.upperBound.advanced(by: 1)) }
+//  subscript(_ range: PartialRangeUpTo<Int>) -> SubSequence { prefix(range.upperBound) }
+//  subscript(_ range: PartialRangeFrom<Int>) -> SubSequence { suffix(Swift.max(0, count-range.lowerBound)) }
 }
 
 // MARK: - String Extensions
@@ -128,29 +128,29 @@ extension String {
   
   // ----------------------
   
-//      var length: Int {
-//          return count
-//      }
-//  
-//      subscript (i: Int) -> String {
-//          return self[i ..< i + 1]
-//      }
-//  
-//      func substring(fromIndex: Int) -> String {
-//          return self[min(fromIndex, length) ..< length]
-//      }
-//  
-//      func substring(toIndex: Int) -> String {
-//          return self[0 ..< max(0, toIndex)]
-//      }
-//  
-//      subscript (r: Range<Int>) -> String {
-//          let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-//                                              upper: min(length, max(0, r.upperBound))))
-//          let start = index(startIndex, offsetBy: range.lowerBound)
-//          let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-//          return String(self[start ..< end])
-//      }
+      var length: Int {
+          return count
+      }
+
+      subscript (i: Int) -> String {
+          return self[i ..< i + 1]
+      }
+
+      func substring(fromIndex: Int) -> String {
+          return self[min(fromIndex, length) ..< length]
+      }
+
+      func substring(toIndex: Int) -> String {
+          return self[0 ..< max(0, toIndex)]
+      }
+
+      subscript (r: Range<Int>) -> String {
+          let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
+                                              upper: min(length, max(0, r.upperBound))))
+          let start = index(startIndex, offsetBy: range.lowerBound)
+          let end = index(start, offsetBy: range.upperBound - range.lowerBound)
+          return String(self[start ..< end])
+      }
   
   
   // -------------------

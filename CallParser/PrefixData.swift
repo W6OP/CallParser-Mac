@@ -23,7 +23,7 @@ public struct PrefixData: Hashable {
   
    private let pointsOfInterest = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: .pointsOfInterest)
   
-  public var indexKey = Set<Character>()
+  public var indexKey = Set<String>()
   public var maskList = Set<[[String]]>() //maskList = new HashSet<List<string[]>>();
   public var tempMaskList = [String]()
   public var rank = 0
@@ -93,7 +93,7 @@ public struct PrefixData: Hashable {
   func maskExists(call: String, length: Int) -> Bool {
     
     // slices
-    let subCall = call[0...length - 1]
+    let subCall = call[0..<length]
     let first = String(subCall[0])
     let second = String(subCall[1])
     let portable = "/"
@@ -251,7 +251,7 @@ public struct PrefixData: Hashable {
     maskList.insert(value)
     
     for first in value[0] {
-      indexKey.insert(Character(first))
+      indexKey.insert(first)
     }
   }
  

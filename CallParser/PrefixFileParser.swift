@@ -266,11 +266,11 @@ public class PrefixFileParser: NSObject, ObservableObject {
     expandedCharacters = mask.replacingOccurrences(of: "#", with: "0123456789")
     expandedCharacters = expandedCharacters.replacingOccurrences(of: "@", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     expandedCharacters = expandedCharacters.replacingOccurrences(of: "?", with: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-    //expando = expando.replacingOccurrences(of: "-", with: "...")
    
     return expandedCharacters
   }
   
+  /// Expand
    func expandRange(first: String, second: String) -> [String] {
     
     let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -287,15 +287,15 @@ public class PrefixFileParser: NSObject, ObservableObject {
     }
     
     // 0-C - NOT TESTED
-    if first.isInteger && !second.isInteger {
+    if first.isInteger && second.isAlphabetic {
       if let firstInteger = Int(first){
           let range: Range<String.Index> = alphabet.range(of: second)!
           let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
          
         let _: [Int] = Array(firstInteger...9)
-          let myRange: ClosedRange = 0...index
+          //let myRange: ClosedRange = 0...index
       
-        for item in alphabet[myRange] {
+        for item in alphabet[0..<index] {
           expando.append(String(item))
           print (item)
         }
@@ -304,15 +304,15 @@ public class PrefixFileParser: NSObject, ObservableObject {
     }
     
     // W-3 - NOT TESTED
-    if !first.isInteger && second.isInteger {
+    if first.isAlphabetic && second.isInteger {
       if let secondInteger = Int(second){
           let range: Range<String.Index> = alphabet.range(of: first)!
-          let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
+          let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.upperBound)
          
         let _: [Int] = Array(0...secondInteger)
-          let myRange: ClosedRange = index...25
+        //let myRange: ClosedRange = index...25
       
-        for item in alphabet[myRange] {
+        for item in alphabet[index..<25] {
           expando.append(String(item))
           print (item)
         }
@@ -321,23 +321,24 @@ public class PrefixFileParser: NSObject, ObservableObject {
     }
     
     // A-G
-    if !first.isInteger && !second.isInteger {
+    if first.isAlphabetic && second.isAlphabetic {
     
       let range: Range<String.Index> = alphabet.range(of: first)!
       let index: Int = alphabet.distance(from: alphabet.startIndex, to: range.lowerBound)
       
       let range2: Range<String.Index> = alphabet.range(of: second)!
-      let index2: Int = alphabet.distance(from: alphabet.startIndex, to: range2.lowerBound)
+      let index2: Int = alphabet.distance(from: alphabet.startIndex, to: range2.upperBound)
       
-      let myRange: ClosedRange = index...index2
+      //let myRange: ClosedRange = index...index2
      
-      for item in alphabet[myRange] {
+      for item in alphabet[index..<index2] {
         expando.append(String(item))
       }
       
       // the first character has already been stored
       expando.remove(at: 0)
     }
+    //print("\(first):\(second):\(expando)")
       
     return expando
   }
