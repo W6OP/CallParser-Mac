@@ -12,6 +12,7 @@ public struct CallStructure {
   
   private var singleCharacterPrefixes: [String] = ["F", "G", "M", "I", "R", "W" ]
   
+  public var pattern = ""
   public var prefix: String!
   public var baseCall: String!
   public var fullCall: String!
@@ -377,13 +378,13 @@ public struct CallStructure {
    ValidPrefixes = ':@:@@:@@#:@@#@:@#:@#@:@##:#@:#@@:#@#:#@@#:';
    ValidStructures = ':C:C#:C#M:C#T:CM:CM#:CMM:CMP:CMT:CP:CPM:CT:PC:PCM:PCT:';
    */
-  func getComponentType(candidate: String, position: Int) -> ComponentType {
+  mutating func getComponentType(candidate: String, position: Int) -> ComponentType {
     
     let validPrefixes = ["@", "@@", "@@#", "@@#@", "@#", "@#@", "@##", "#@", "#@@", "#@#", "#@@#"]
     let validPrefixOrCall = ["@@#@", "@#@"]
     var componentType = ComponentType.unknown
     
-    let pattern = buildPattern(candidate: candidate)
+    pattern = buildPattern(candidate: candidate)
     
     if pattern.isEmpty {
       return ComponentType.unknown
@@ -447,13 +448,6 @@ public struct CallStructure {
   }
   
   /**
-   
-   
-   */
-  
-  
-  
-  /**
    one of "@","@@","#@","#@@" followed by 1-4 digits followed by 1-6 letters
    create pattern from call and see if it matches valid patterns
    */
@@ -505,11 +499,11 @@ public struct CallStructure {
   /**
    Test if a candidate is truly a prefix.
    */
-  func verifyIfPrefix(candidate: String, position: Int) -> ComponentType {
+  mutating func verifyIfPrefix(candidate: String, position: Int) -> ComponentType {
     
     let validprefixes = ["@", "@@", "@@#", "@@#@", "@#", "@#@", "@##", "#@", "#@@", "#@#", "#@@#"]
     
-    let pattern = buildPattern(candidate: candidate)
+    pattern = buildPattern(candidate: candidate)
     
     if candidate.count == 1 {
       switch position {
@@ -557,27 +551,6 @@ public struct CallStructure {
             pattern += String($0)
         }
     }
-    
-//    for item in candidate {
-//      switch true {
-//
-//      case String(item).isAlphabetic:
-//        pattern += "@"
-//
-//      case String(item).isInteger:
-//        pattern += "#"
-//
-//      case item == "/":
-//        pattern += "/"
-//
-//      case item == ".":
-//        pattern += "."
-//
-//      default:
-//        // should never default
-//        print("hit default - \(candidate) buildPattern \(item) line 600")
-//      }
-//    }
       return pattern
   }
 

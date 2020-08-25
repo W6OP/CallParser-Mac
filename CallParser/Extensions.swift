@@ -17,50 +17,12 @@ extension Array where Element: Equatable {
     }
 }
 
-// MARK: - String Extensions ----------------------------------------------------------------------------
-
-/// https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
-//extension String {
-//    subscript (i: Int) -> Character {
-//        return self[index(startIndex, offsetBy: i)]
-//    }
-//
-//    subscript (bounds: CountableRange<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        if end < start { return "" }
-//        return self[start..<end]
-//    }
-//
-//    subscript (bounds: CountableClosedRange<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        if end < start { return "" }
-//        return self[start...end]
-//    }
-//
-//    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
-//        let start = index(startIndex, offsetBy: bounds.lowerBound)
-//        let end = index(endIndex, offsetBy: -1)
-//        if end < start { return "" }
-//        return self[start...end]
-//    }
-//
-//    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        if end < startIndex { return "" }
-//        return self[startIndex...end]
-//    }
-//
-//    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
-//        let end = index(startIndex, offsetBy: bounds.upperBound)
-//        if end < startIndex { return "" }
-//        return self[startIndex..<end]
-//    }
-//}
-
 // MARK: - String Protocol Extensions
+
+// also look at https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
 // https://stackoverflow.com/questions/32305891/index-of-a-substring-in-a-string-with-swift
+// https://rbnsn.me/multi-core-array-operations-in-swift
+// https://medium.com/better-programming/24-swift-extensions-for-cleaner-code-41e250c9c4c3
 
 /// For string slices
 extension StringProtocol where Index == String.Index {
@@ -68,45 +30,9 @@ extension StringProtocol where Index == String.Index {
   func endIndex<S: StringProtocol>(of string: S, options: String.CompareOptions = []) -> Index? {
     range(of: string, options: options)?.upperBound
   }
-//
-//  // get substrings (slices) using a subscript or range
-//  // https://stackoverflow.com/questions/30018006/understanding-the-removerange-documentation
-//  subscript(_ offset: Int) -> Element { self[index(startIndex, offsetBy: offset)] }
-//  subscript(_ range: Range<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
-//  subscript(_ range: ClosedRange<Int>) -> SubSequence { prefix(range.lowerBound+range.count).suffix(range.count) }
-//  subscript(_ range: PartialRangeThrough<Int>) -> SubSequence { prefix(range.upperBound.advanced(by: 1)) }
-//  subscript(_ range: PartialRangeUpTo<Int>) -> SubSequence { prefix(range.upperBound) }
-//  subscript(_ range: PartialRangeFrom<Int>) -> SubSequence { suffix(Swift.max(0, count-range.lowerBound)) }
 }
 
 // MARK: - String Extensions
-
-//extension String {
-//
-//    var length: Int {
-//        return count
-//    }
-//
-//    subscript (i: Int) -> String {
-//        return self[i ..< i + 1]
-//    }
-//
-//    func substring(fromIndex: Int) -> String {
-//        return self[min(fromIndex, length) ..< length]
-//    }
-//
-//    func substring(toIndex: Int) -> String {
-//        return self[0 ..< max(0, toIndex)]
-//    }
-//
-//    subscript (r: Range<Int>) -> String {
-//        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)),
-//                                            upper: min(length, max(0, r.upperBound))))
-//        let start = index(startIndex, offsetBy: range.lowerBound)
-//        let end = index(start, offsetBy: range.upperBound - range.lowerBound)
-//        return String(self[start ..< end])
-//    }
-//}
 
 // https://www.agnosticdev.com/content/how-get-first-or-last-characters-string-swift-4
 // Build your own String Extension for grabbing a character at a specific position
@@ -114,17 +40,17 @@ extension StringProtocol where Index == String.Index {
 // nil returned if value to large for string
 extension String {
   
-//  func index(at position: Int, from start: Index? = nil) -> Index? {
-//    let startingIndex = start ?? startIndex
-//    return index(startingIndex, offsetBy: position, limitedBy: endIndex)
-//  }
-//
-//  func character(at position: Int) -> String? {
-//    guard position >= 0 && position <= self.count - 1, let indexPosition = index(at: position) else {
-//      return nil
-//    }
-//    return String(self[indexPosition])
-//  }
+  func index(at position: Int, from start: Index? = nil) -> Index? {
+    let startingIndex = start ?? startIndex
+    return index(startingIndex, offsetBy: position, limitedBy: endIndex)
+  }
+
+  func character(at position: Int) -> String? {
+    guard position >= 0 && position <= self.count - 1, let indexPosition = index(at: position) else {
+      return nil
+    }
+    return String(self[indexPosition])
+  }
   
   // ----------------------
   
@@ -152,8 +78,63 @@ extension String {
           return String(self[start ..< end])
       }
   
+  // in some cases these may be preferable to those above
+  // allows to use simple Ints for subscripting strings
   
-  // -------------------
+//  subscript (i: Int) -> Character {
+//      return self[index(startIndex, offsetBy: i)]
+//  }
+//
+//  subscript (bounds: CountableRange<Int>) -> Substring {
+//      let start = index(startIndex, offsetBy: bounds.lowerBound)
+//      let end = index(startIndex, offsetBy: bounds.upperBound)
+//      if end < start { return "" }
+//      return self[start..<end]
+//  }
+//
+//  subscript (bounds: CountableClosedRange<Int>) -> Substring {
+//      let start = index(startIndex, offsetBy: bounds.lowerBound)
+//      let end = index(startIndex, offsetBy: bounds.upperBound)
+//      if end < start { return "" }
+//      return self[start...end]
+//  }
+//
+//  subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
+//      let start = index(startIndex, offsetBy: bounds.lowerBound)
+//      let end = index(endIndex, offsetBy: -1)
+//      if end < start { return "" }
+//      return self[start...end]
+//  }
+//
+//  subscript (bounds: PartialRangeThrough<Int>) -> Substring {
+//      let end = index(startIndex, offsetBy: bounds.upperBound)
+//      if end < startIndex { return "" }
+//      return self[startIndex...end]
+//  }
+//
+//  subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
+//      let end = index(startIndex, offsetBy: bounds.upperBound)
+//      if end < startIndex { return "" }
+//      return self[startIndex..<end]
+//  }
+ // ------------------------------------------------------------------
+  
+  /// trim string - remove spaces and other similar symbols (for example, new lines and tabs)
+  var trimmed: String {
+      self.trimmingCharacters(in: .whitespacesAndNewlines)
+  }
+  
+  mutating func trim() {
+      self = self.trimmed
+  }
+  // ------------------------------------------------------------------
+  // get date from string
+  func toDate(format: String) -> Date? {
+      let df = DateFormatter()
+      df.dateFormat = format
+      return df.date(from: self)
+  }
+  // ------------------------------------------------------------------
   
   // test if a character is an int
   var isInteger: Bool {
@@ -166,6 +147,11 @@ extension String {
     return Set(self).isSubset(of: nums)
   }
   
+  var containsOnlyDigits: Bool {
+      let notDigits = NSCharacterSet.decimalDigits.inverted
+      return rangeOfCharacter(from: notDigits, options: String.CompareOptions.literal, range: nil) == nil
+  }
+  
   var isAlphabetic: Bool {
     guard self.count > 0 else { return false }
     let alphas: Set<Character> = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
@@ -176,6 +162,11 @@ extension String {
     return self.rangeOfCharacter(from: CharacterSet.alphanumerics.inverted) == nil && self != ""
   }
   
+//  var isAlphanumeric: Bool {
+//      !isEmpty && range(of: "[^a-zA-Z0-9]", options: .regularExpression) == nil
+//  }
+  
+  // ------------------------------------------------------------------
   // here to end
   // https://stackoverflow.com/questions/29971505/filter-non-digits-from-string
   var onlyDigits: String { return onlyCharacters(charSets: [.decimalDigits]) }
@@ -198,8 +189,6 @@ extension String {
   func onlyCharacters(charSet: CharacterSet) -> String { return onlyCharacters(charSets: [charSet]) }
 }
 
-
-
 // MARK: - Extension Collection ----------------------------------------------------------------------------
 
 // if the digit is the next in value 5,6 = true
@@ -210,54 +199,43 @@ extension Int {
     }
     return false
   }
+  
+  func toDouble() -> Double {
+      Double(self)
+  }
+  
+  func toString() -> String {
+      "\(self)"
+  }
 }
 
+extension Double {
+    func toInt() -> Int {
+        Int(self)
+    }
+  
+  func toString() -> String {
+      String(format: "%.02f", self)
+  }
+}
 
-/// Trim String in Swift, Remove spaces and other similar symbols (for example, new lines and tabs).
-/// Usage: var str1 = "  a b c d e   \n"
-/// var str2 = str1.trimmed
-/// str1.trim()
-//extension String {
-//    var trimmed: String {
-//        self.trimmingCharacters(in: .whitespacesAndNewlines)
-//    }
-//
-//    mutating func trim() {
-//        self = self.trimmed
-//    }
-//}
+// get string from date
+extension Date {
+    func toString(format: String) -> String {
+        let df = DateFormatter()
+        df.dateFormat = format
+        return df.string(from: self)
+    }
+}
 
-/// Int.toDouble() and Double.toInt()
-/// These methods can be useful if you work with optionals. If you have non-optional Int, you can convert it with Double(a), where a is an integer variable. But if a is optional, you can’t do it.
-//extension Int {
-//    func toDouble() -> Double {
-//        Double(self)
-//    }
-//}
-//
-//extension Double {
-//    func toInt() -> Int {
-//        Int(self)
-//    }
-//}
-
-/// String.toDate(…) and Date.toString(…)
-/// Getting the Date from String and formatting the Date to display it or send to API are common tasks. The standard way to convert takes three lines of code. Let’s see how to make it shorter:
-/// Usage: let strDate = "2020-08-10 15:00:00"
-/// let date = strDate.toDate(format: "yyyy-MM-dd HH:mm:ss")
-/// let strDate2 = date?.toString(format: "yyyy-MM-dd HH:mm:ss")
-//extension String {
-//    func toDate(format: String) -> Date? {
-//        let df = DateFormatter()
-//        df.dateFormat = format
-//        return df.date(from: self)
-//    }
-//}
-//
-//extension Date {
-//    func toString(format: String) -> String {
-//        let df = DateFormatter()
-//        df.dateFormat = format
-//        return df.string(from: self)
-//    }
-//}
+//  allows to get the app version from Info.plist
+// let appVersion = Bundle.mainAppVersion
+extension Bundle {
+    var appVersion: String? {
+        self.infoDictionary?["CFBundleShortVersionString"] as? String
+    }
+    
+    static var mainAppVersion: String? {
+        Bundle.main.appVersion
+    }
+}

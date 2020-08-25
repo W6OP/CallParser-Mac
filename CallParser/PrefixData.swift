@@ -21,7 +21,7 @@ public struct PrefixData: Hashable {
     case empty = ""
   }
   
-   private let pointsOfInterest = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: .pointsOfInterest)
+  private let pointsOfInterest = OSLog(subsystem: Bundle.main.bundleIdentifier!, category: .pointsOfInterest)
   
   public var indexKey = Set<String>()
   public var maskList = Set<[[String]]>() //maskList = new HashSet<List<string[]>>();
@@ -87,160 +87,96 @@ public struct PrefixData: Hashable {
     return temp
   }
   
-  /**
-   
-   */
-  func maskExists(call: String, length: Int) -> Bool {
+  /// If a mask matching the pattern exists return true
+  /// -parameters:
+  /// call: String
+  /// units: [String]
+  /// length: Int
+  /// returns: Bool
+  func maskExists(call: String, units: [String], length: Int) -> Bool {
+      
+      let first = units[0]
+      let second = units[1]
+      let third = units[2]
+      let fourth = units[3]
+      let fifth = units[4]
+      let sixth = units[5]
+      let seventh = units[6]
     
-    // slices
-    let subCall = call[0..<length]
-    let first = String(subCall[0])
-    let second = String(subCall[1])
-    let portable = "/"
-    var third: String
-    var fourth: String
-    var fifth: String
-    var sixth: String
-    var seventh: String
-    var maskExists = false
-    
-    //os_signpost(.begin, log: pointsOfInterest, name: "maskExists start")
-//    defer {
-//      os_signpost(.end, log: pointsOfInterest, name: "maskExists end")
-//    }
-    
-    for item in maskList {
-     
-        let searchLength = min(length, item.count)
-        
-        switch searchLength {
-        case 2:
-          if item[1].contains(second) && item[0].contains(first) {
-            //if (item.Last()[0] != "/") C#
-            //if item[item.count - 1].first != portable {
-            if item.last?[0] != portable {
-              maskExists = true
-            }
-          }
-          
-        case 3:
-          third = String(subCall[2])
-          if item[2].contains(third) && item[1].contains(second) && item[0].contains(first) {
-            if item.last?[0] != portable {
-              maskExists =  true
-            }
-          }
-          
-        case 4:
-          third = String(subCall[2])
-          fourth = String(subCall[3])
-          if item[3].contains(fourth) && item[2].contains(third) && item[1].contains(second) &&  item[0].contains(first) {
-            if item.last?[0] != portable {
-              maskExists =  true
-            }
-          }
-          
-        case 5:
-          third = String(subCall[2])
-          fourth = String(subCall[3])
-          fifth = String(subCall[4])
-          // if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth) {
-          if item[4].contains(fifth) && item[3].contains(fourth) && item[2].contains(third)  && item[1].contains(second)  && item[0].contains(first) {
-            if item.last?[0] != portable {
-              maskExists =  true
-            }
-          }
-          
-        case 6:
-          third = String(subCall[2])
-          fourth = String(subCall[3])
-          fifth = String(subCall[4])
-          sixth = String(subCall[5])
-          //if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) {
-          if item[5].contains(sixth) && item[4].contains(fifth) && item[3].contains(fourth)  && item[2].contains(third)  && item[1].contains(second)  && item[0].contains(first) {
-            if item.last?[0] != portable {
-              maskExists =  true
-            }
-          }
-          
-        case 7:
-          third = String(subCall[2])
-          fourth = String(subCall[3])
-          fifth = String(subCall[4])
-          sixth = String(subCall[5])
-          seventh = String(subCall[6])
-          // if item[0].contains(first) && item[1].contains(second) && item[2].contains(third)  && item[3].contains(fourth)  && item[4].contains(fifth)  && item[5].contains(sixth) && item[6].contains(seventh) {
-          if item[6].contains(seventh) && item[5].contains(sixth) && item[4].contains(fifth)  && item[3].contains(fourth)  && item[2].contains(third)  && item[1].contains(second) && item[0].contains(first) {
-            if item.last?[0] != portable {
-              maskExists =  true
-            }
-          }
-          
-        default:
-          maskExists = false
-        }
-    }
-    
-    //os_signpost(.end, log: pointsOfInterest, name: "maskExists end")
-    
-    if !maskExists {
-      _ = 1
-    }
-    return maskExists
-  }
-  
-  /**
-   Check if a portable mask exists.
-   */
-//   func portableMaskExist(call: String) -> Bool {
-//
-//    let count = call.count
-//    let first = String(call[0])
-//    let second = String(call[1])
-//    var third: String
-//    var fourth: String
-//    var fifth: String
-//    var sixth: String
-//
-//    // item is [String] - maskList is [[String]]
-//    for item in maskList { //}(where: {$0.count == call.count}) {
-//      if item.count == count {
-//        for mask in item {
-//          switch count {
-//          case 2:
-//            if mask[0].contains(first) && mask[1].contains(second) {return true}
-//
-//          case 3:
-//            third = String(call[2])
-//            if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third) {return true}
-//
-//          case 4:
-//            third = String(call[2])
-//            fourth = String(call[3])
-//            if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth) {return true}
-//
-//          case 5:
-//            third = String(call[2])
-//            fourth = String(call[3])
-//            fifth = String(call[4])
-//            if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth)  && mask[4].contains(fifth) {return true}
-//
-//          case 6:
-//            third = String(call[2])
-//            fourth = String(call[3])
-//            fifth = String(call[4])
-//            sixth = String(call[5])
-//            if mask[0].contains(first) && mask[1].contains(second) && mask[2].contains(third)  && mask[3].contains(fourth)  && mask[4].contains(fifth)  && mask[5].contains(sixth) {return true}
-//
-//          default:
-//            break
-//          }
-//        }
+      let portable = "/"
+      var maskExists = false
+      
+//      os_signpost(.begin, log: pointsOfInterest, name: "maskExists start")
+//      defer {
+//        os_signpost(.end, log: pointsOfInterest, name: "maskExists end")
 //      }
-//    }
-//
-//    return false
-//  }
+      
+      for item in maskList {
+       
+          // use the smaller of the two to search with
+          let searchLength = min(length, item.count)
+          
+          switch searchLength {
+          case 2:
+            //os_signpost(.event, log: pointsOfInterest, name: "maskExists 2")
+            if item[1].contains(second) && item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists = true
+              }
+            }
+            
+          case 3:
+            if item[2].contains(third) && item[1].contains(second) && item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists =  true
+                //os_signpost(.event, log: pointsOfInterest, name: "maskExists 3")
+              }
+            }
+            
+          case 4:
+            if item[3].contains(fourth) && item[2].contains(third) && item[1].contains(second) &&  item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists =  true
+                //os_signpost(.event, log: pointsOfInterest, name: "maskExists 4")
+              }
+            }
+            
+          case 5:
+            if item[4].contains(fifth) && item[3].contains(fourth) && item[2].contains(third)  && item[1].contains(second)  && item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists =  true
+                //os_signpost(.event, log: pointsOfInterest, name: "maskExists 5")
+              }
+            }
+            
+          case 6:
+            if item[5].contains(sixth) && item[4].contains(fifth) && item[3].contains(fourth)  && item[2].contains(third)  && item[1].contains(second)  && item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists =  true
+                //os_signpost(.event, log: pointsOfInterest, name: "maskExists 6")
+              }
+            }
+            
+          case 7:
+            if item[6].contains(seventh) && item[5].contains(sixth) && item[4].contains(fifth)  && item[3].contains(fourth)  && item[2].contains(third)  && item[1].contains(second) && item[0].contains(first) {
+              if item.last?[0] != portable {
+                maskExists =  true
+                //os_signpost(.event, log: pointsOfInterest, name: "maskExists 7")
+              }
+            }
+            
+          default:
+            maskExists = false
+          }
+      }
+      
+      //os_signpost(.end, log: pointsOfInterest, name: "maskExists end")
+      
+      if !maskExists {
+        _ = 1
+      }
+      return maskExists
+    }
   
   /**
    The index key is a character that can be the first letter of a call.
@@ -297,24 +233,17 @@ public struct PrefixData: Hashable {
   /**
    Check if a portable mask exists.
    */
-  public func portableMaskExists(call: String) -> Bool {
+  public func portableMaskExists(call: [String]) -> Bool {
     
     let first = call[0]
     let second = call[1]
-    var third: String
-    var fourth: String
-    var fifth: String
-    var sixth: String
-    
+    let third = call[2]
+    let fourth = call[3]
+    let fifth = call[4]
+    let sixth = call[5]
     
     for item in maskList where item.count == call.count {
-      //for mask in item where item.count == call.count {
-        // can I compare this with call???
-//        let joined = item.joined()
-//        if joined == call {
-//          return true
-//        }
-        
+     
         switch call.count {
           
         case 2:
@@ -323,31 +252,21 @@ public struct PrefixData: Hashable {
           }
           
         case 3:
-          third = String(call[2])
           if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)){
             return true
           }
           
         case 4:
-          third = String(call[2])
-          fourth = String(call[3])
           if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth)){
             return true
           }
           
         case 5:
-          third = String(call[2])
-          fourth = String(call[3])
-          fifth = String(call[4])
           if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth))  && item[4].contains(String(fifth)){
             return true
           }
           
         case 6:
-          third = String(call[2])
-          fourth = String(call[3])
-          fifth = String(call[4])
-          sixth = String(call[5])
           if item[0].contains(String(first)) && item[1].contains(String(second)) && item[2].contains(String(third)) && item[3].contains(String(fourth))  && item[4].contains(String(fifth)) && item[5].contains(String(sixth)){
             return true
           }
@@ -355,7 +274,6 @@ public struct PrefixData: Hashable {
         default:
           break
         }
-      //}
     }
     
     return false

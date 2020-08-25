@@ -103,60 +103,22 @@ enum SearchBy: String {
   case none
 }
 
+class LimitedWorker {
+    private let serialQueue = DispatchQueue(label: "com.khanlou.serial.queue")
+    private let concurrentQueue = DispatchQueue(label: "com.khanlou.concurrent.queue", attributes: .concurrent)
+    private let semaphore: DispatchSemaphore
 
-// also look at https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language
+    init(limit: Int) {
+        semaphore = DispatchSemaphore(value: limit)
+    }
 
-
-
-// if the digit is the next in value 5,6 = true
-//extension Int {
-//  func isSuccessor(first: Int, second: Int) -> Bool {
-//    if second - first == 1 {
-//      return true
-//    }
-//    return false
-//  }
-//}
-
-
-// MARK: - String Extension ----------------------------------------------------------------------------
-
-// https://stackoverflow.com/questions/32305891/index-of-a-substring-in-a-string-with-swift
-/**
- USAGE:
- let str = "abcde"
- if let index = str.index(of: "cd") {
- let substring = str[..<index]   // ab
- let string = String(substring)
- print(string)  // "ab\n"
- }
- */
-
-
-
- // Note that they all return a Substring of the original String.
- // To create a new String from a substring
- //test[10...].string  // "🇺🇸!!! Hello Brazil 🇧🇷!!!
-
-
-// https://rbnsn.me/multi-core-array-operations-in-swift
-//public extension Array {
-//    /// Synchronous
-//    func concurrentMap<T>(transform: @escaping (Element) -> T) -> [T] {
-//        let result = UnsafeMutablePointer<T>.allocate(capacity: count)
-//
-//        DispatchQueue.concurrentPerform(iterations: count) { i in
-//            result.advanced(by: i).initialize(to: transform(self[i]))
-//        }
-//
-//        let finalResult = Array<T>(UnsafeBufferPointer(start: result, count: count))
-//        result.deallocate()
-//
-//        return finalResult
-//    }
-//
-//    /// Synchronous
-//    func concurrentForEach(action: @escaping (Element) -> Void) {
-//        _ = concurrentMap { _ = action($0) }
-//    }
-//}
+    func enqueue(task: @escaping () -> ()) {
+        serialQueue.async(execute: {
+            self.semaphore.wait()
+            self.concurrentQueue.async(execute: {
+                task()
+                self.semaphore.signal()
+            })
+        })
+    }
+}

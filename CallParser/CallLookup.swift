@@ -70,7 +70,7 @@ public struct Hit: Identifiable, Hashable {
 public class CallLookup: ObservableObject{
     
   let queue = DispatchQueue(label: "com.w6op.calllookupqueue", qos: .userInitiated, attributes: .concurrent)
-  let batchQueue = DispatchQueue(label: "com.w6op.batchlookupqueue", qos: .utility, attributes: .concurrent)
+  let batchQueue = DispatchQueue(label: "com.w6op.batchlookupqueue", qos: .userInitiated, attributes: .concurrent)
     //let semaphore = DispatchSemaphore(value: 30)
     
     var hitList = [Hit]()
@@ -110,7 +110,7 @@ public class CallLookup: ObservableObject{
      */
     public func lookupCall(call: String) -> [Hit] {
       
-            hitList = [Hit]()
+      hitList = [Hit]()
       queue.async {
         self.processCallSign(callSign: call.uppercased())
       }
@@ -138,26 +138,43 @@ public class CallLookup: ObservableObject{
     
     hitList = [Hit]()
     hitList.reserveCapacity(callList.count)
-    prefixDataList = [Hit]()
-    prefixDataList.reserveCapacity(callList.count)
+    
+    UI {
+      self.prefixDataList = [Hit]()
+      self.prefixDataList.reserveCapacity(callList.count)
+    }
     
     let start = CFAbsoluteTimeGetCurrent()
     
-    //batchQueue.sync {
-      DispatchQueue.concurrentPerform(iterations: callList.count - 1) { index in
-      self.processCallSign(callSign: callList[index])
-      }
-    //}
+   
+    let dispatchGroup = DispatchGroup()
+
+    DispatchQueue.global(qos: .userInitiated).sync {
+       callList.forEach {_ in dispatchGroup.enter()}
+          DispatchQueue.concurrentPerform(iterations: callList.count) { index in //callList.count
+              self.processCallSign(callSign: callList[index])
+              dispatchGroup.leave()
+          }
+          self.onComplete()
+    }
+    
     
     let diff = CFAbsoluteTimeGetCurrent() - start
     print("Took \(diff) seconds")
     
+//    UI {
+//      self.prefixDataList = Array(self.hitList.prefix(2000)) // .prefix(1000)
+//      print ("Hit List: \(self.hitList.count) -- PrifixDataList: \(self.prefixDataList.count)")
+//    }
+    
+    return hitList
+  }
+  
+  func onComplete() {
     UI {
       self.prefixDataList = Array(self.hitList.prefix(2000)) // .prefix(1000)
       print ("Hit List: \(self.hitList.count) -- PrifixDataList: \(self.prefixDataList.count)")
     }
-    
-    return hitList
   }
 
   /**
@@ -195,7 +212,12 @@ public class CallLookup: ObservableObject{
      */
     func processCallSign(callSign: String) {
       
-        var cleanedCall = ""// = callSign
+//      os_signpost(.begin, log: pointsOfInterest, name: "processCallSign start")
+//      defer {
+//        os_signpost(.end, log: pointsOfInterest, name: "processCallSign end")
+//      }
+      
+      var cleanedCall = ""// = callSign
       
       // if there are spaces in the call don't process it
       cleanedCall = callSign.replacingOccurrences(of: " ", with: "")
@@ -238,6 +260,9 @@ public class CallLookup: ObservableObject{
         
     let callStructureType = callStructure.callStructureType
     
+//    if callStructure.baseCall == "B1Z" {
+//      _ = 1
+//    }
 //    os_signpost(.begin, log: pointsOfInterest, name: "collectMatches start")
 //    defer {
 //      os_signpost(.end, log: pointsOfInterest, name: "collectMatches end")
@@ -282,39 +307,43 @@ public class CallLookup: ObservableObject{
    */
   func  searchMainDictionary(callStructure: CallStructure, saveHit: Bool) -> (mainPrefix: String, result: Bool)
   {
-    let prefix = callStructure.prefix
+    //let prefix = callStructure.prefix
     
     var pattern: String
     var searchBy = SearchBy.prefix
     
-//    os_signpost(.begin, log: pointsOfInterest, name: "searchMainDictionary start")
-//    defer {
-//      os_signpost(.end, log: pointsOfInterest, name: "searchMainDictionary end")
-//    }
-    
-    switch (true) {
-      
-    case callStructure.callStructureType == CallStructureType.prefixCall
-      || callStructure.callStructureType == CallStructureType.prefixCallPortable
-      || callStructure.callStructureType == CallStructureType.prefixCallText
-      && prefix!.count == 1:
-      
-      // TODO: ist this redundant, could I have saved it earlier?
-      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
-      
-    case callStructure.callStructureType == CallStructureType.prefixCall:
-      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
-      
-    case callStructure.callStructureType == CallStructureType.prefixCall:
-      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
-      
-    case callStructure.callStructureType == CallStructureType.prefixCallText:
-      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
-      
-    default:
-      searchBy = SearchBy.call
+    if String(callStructure.callStructureType.rawValue.first!) == "C" {
       pattern = callStructure.buildPattern(candidate: callStructure.baseCall)
+      searchBy = SearchBy.call
+    } else {
+      pattern = callStructure.buildPattern(candidate: callStructure.prefix)
     }
+    
+    
+//    switch (true) {
+//
+//    case callStructure.callStructureType == CallStructureType.prefixCall
+//      || callStructure.callStructureType == CallStructureType.prefixCallPortable
+//      || callStructure.callStructureType == CallStructureType.prefixCallText
+//      && prefix!.count == 1:
+//       print("Type: \(callStructure.callStructureType)")
+//      // TODO: is this redundant, could I have saved it earlier?
+//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
+//
+//    case callStructure.callStructureType == CallStructureType.prefixCall:
+//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
+//       print("Type: \(callStructure.callStructureType)")
+////    case callStructure.callStructureType == CallStructureType.prefixCall:
+////      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
+//
+//    case callStructure.callStructureType == CallStructureType.prefixCallText:
+//      pattern = callStructure.pattern // //.buildPattern(candidate: callStructure.prefix)
+//       print("Prefix Type: \(callStructure.callStructureType)")
+//    default:
+//      searchBy = SearchBy.call
+//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.baseCall)
+//      print("Default Type: \(callStructure.callStructureType)")
+//    }
     
     return performSearch(candidate: pattern, callStructure: callStructure, searchBy: searchBy, saveHit: saveHit)
   }
@@ -329,7 +358,7 @@ public class CallLookup: ObservableObject{
     var pattern = candidate + "."
     var temp = Set<PrefixData>()
     var list = Set<PrefixData>()
-    var firstLetter: String
+    var first: String
     var searchTerm = ""
     
 //    os_signpost(.begin, log: pointsOfInterest, name: "performSearch start")
@@ -341,14 +370,24 @@ public class CallLookup: ObservableObject{
     case .call:
       let baseCall = callStructure.baseCall
       searchTerm = baseCall!
-      firstLetter = baseCall![0]
+      first = baseCall![0]
     default:
       let prefix = callStructure.prefix
-      firstLetter = prefix![0]
+      first = prefix![0]
       searchTerm = prefix!
       if prefix!.count > 1 {
       }
     }
+    
+    // major performance improvement when I moved this from masksExists
+    let second = searchTerm[1]
+    let third = searchTerm[2]
+    let fourth  = searchTerm[3]
+    let fifth = searchTerm[4]
+    let sixth = searchTerm[5]
+    let seventh = searchTerm[6]
+    
+    let units = [first, second, third, fourth, fifth, sixth, seventh]
     
     while (pattern.count > 1)
     {
@@ -359,14 +398,14 @@ public class CallLookup: ObservableObject{
         temp = Set<PrefixData>()
 
         for prefixData in valuesExists {
-          if prefixData.indexKey.contains(firstLetter) {
+          if prefixData.indexKey.contains(first) {
             if pattern.last == "." {
-              if prefixData.maskExists(call: searchTerm, length: pattern.count - 1) {
+              if prefixData.maskExists(call: String(searchTerm.prefix(pattern.count - 1)), units: units, length: pattern.count - 1) {
                 temp.insert(prefixData)
                 break
               }
             } else {
-              if prefixData.maskExists(call: searchTerm, length: pattern.count) {
+              if prefixData.maskExists(call: String(searchTerm.prefix(pattern.count)), units: units, length: pattern.count) {
                 temp.insert(prefixData)
                 break
               }
@@ -474,8 +513,8 @@ public class CallLookup: ObservableObject{
     let prefix = callStructure.prefix + "/"
     var list = [PrefixData]()
     var temp = [PrefixData]()
-    let firstLetter = prefix[0]
-    let pattern = callStructure.buildPattern(candidate: prefix)
+    let first = prefix[0]
+    let pattern = callStructure.pattern //.buildPattern(candidate: prefix)
     
     if let query = portablePrefixes[pattern] {
       
@@ -484,17 +523,25 @@ public class CallLookup: ObservableObject{
 //        os_signpost(.end, log: pointsOfInterest, name: "checkForPortablePrefix end")
 //      }
       
+      // major performance improvement when I moved this from masksExists
+      let second = prefix[1]
+      let third = prefix[2]
+      let fourth  = prefix[3]
+      let fifth = prefix[4]
+      let sixth = prefix[5]
+      
+      let units = [first, second, third, fourth, fifth, sixth]
+      
       for prefixData in query {
         temp.removeAll()
-        if prefixData.indexKey.contains(firstLetter) {
-          if prefixData.portableMaskExists(call: prefix) {
+        if prefixData.indexKey.contains(first) {
+          if prefixData.portableMaskExists(call: units) {
             temp.append(prefixData)
           }
         }
         
         if temp.count != 0 {
           list = Array(Set(list + temp))
-          //list.UnionWith(temp);
           break
         }
       }
@@ -522,12 +569,6 @@ public class CallLookup: ObservableObject{
 //    defer {
 //      os_signpost(.end, log: pointsOfInterest, name: "buildHit end")
 //    }
-    
-    //https://rbnsn.me/multi-core-array-operations-in-swift
-    //    sortedItems.concurrentForEach {prefixData in
-    //      let hit = Hit(callSign: fullCall, prefixData: prefixData)
-    //      self.hitList.append(hit)
-    //    }
     
     for prefixData in sortedItems {
       let hit = Hit(callSign: fullCall, prefixData: prefixData)
