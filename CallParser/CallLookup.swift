@@ -319,32 +319,6 @@ public class CallLookup: ObservableObject{
       pattern = callStructure.buildPattern(candidate: callStructure.prefix)
     }
     
-    
-//    switch (true) {
-//
-//    case callStructure.callStructureType == CallStructureType.prefixCall
-//      || callStructure.callStructureType == CallStructureType.prefixCallPortable
-//      || callStructure.callStructureType == CallStructureType.prefixCallText
-//      && prefix!.count == 1:
-//       print("Type: \(callStructure.callStructureType)")
-//      // TODO: is this redundant, could I have saved it earlier?
-//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
-//
-//    case callStructure.callStructureType == CallStructureType.prefixCall:
-//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
-//       print("Type: \(callStructure.callStructureType)")
-////    case callStructure.callStructureType == CallStructureType.prefixCall:
-////      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.prefix)
-//
-//    case callStructure.callStructureType == CallStructureType.prefixCallText:
-//      pattern = callStructure.pattern // //.buildPattern(candidate: callStructure.prefix)
-//       print("Prefix Type: \(callStructure.callStructureType)")
-//    default:
-//      searchBy = SearchBy.call
-//      pattern = callStructure.pattern //.buildPattern(candidate: callStructure.baseCall)
-//      print("Default Type: \(callStructure.callStructureType)")
-//    }
-    
     return performSearch(candidate: pattern, callStructure: callStructure, searchBy: searchBy, saveHit: saveHit)
   }
   
