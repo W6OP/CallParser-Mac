@@ -593,9 +593,5 @@ public struct CallStructure {
     
     return false
   }
-  
-  
-  
-  
-  
+
 } // end class

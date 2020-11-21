@@ -9,10 +9,20 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>CallParserTests.xcscheme_^#shared#^_</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>2</integer>
+		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>999D870E248BF1100031B407</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>99E29BCF24FD41A800326193</key>
 		<dict>
 			<key>primary</key>
 			<true/>

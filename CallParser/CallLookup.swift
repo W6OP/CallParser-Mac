@@ -151,7 +151,7 @@ public class CallLookup: ObservableObject{
 
     DispatchQueue.global(qos: .userInitiated).sync {
        callList.forEach {_ in dispatchGroup.enter()}
-          DispatchQueue.concurrentPerform(iterations: callList.count) { index in //callList.count
+          DispatchQueue.concurrentPerform(iterations: callList.count) { index in
               self.processCallSign(callSign: callList[index])
               dispatchGroup.leave()
           }
@@ -354,14 +354,14 @@ public class CallLookup: ObservableObject{
     }
     
     // major performance improvement when I moved this from masksExists
-    let second = searchTerm[1]
-    let third = searchTerm[2]
-    let fourth  = searchTerm[3]
-    let fifth = searchTerm[4]
-    let sixth = searchTerm[5]
-    let seventh = searchTerm[6]
+//    let second = searchTerm[1]
+//    let third = searchTerm[2]
+//    let fourth  = searchTerm[3]
+//    let fifth = searchTerm[4]
+//    let sixth = searchTerm[5]
+//    let seventh = searchTerm[6]
     
-    let units = [first, second, third, fourth, fifth, sixth, seventh]
+    let units = [first, searchTerm[1], searchTerm[2], searchTerm[3], searchTerm[4], searchTerm[5], searchTerm[6]]
     
     while (pattern.count > 1)
     {
@@ -374,12 +374,12 @@ public class CallLookup: ObservableObject{
         for prefixData in valuesExists {
           if prefixData.indexKey.contains(first) {
             if pattern.last == "." {
-              if prefixData.maskExists(call: String(searchTerm.prefix(pattern.count - 1)), units: units, length: pattern.count - 1) {
+              if prefixData.maskExists(units: units, length: pattern.count - 1) {
                 temp.insert(prefixData)
                 break
               }
             } else {
-              if prefixData.maskExists(call: String(searchTerm.prefix(pattern.count)), units: units, length: pattern.count) {
+              if prefixData.maskExists(units: units, length: pattern.count) {
                 temp.insert(prefixData)
                 break
               }

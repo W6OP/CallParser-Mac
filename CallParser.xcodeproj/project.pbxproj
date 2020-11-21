@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 53;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -18,7 +18,19 @@
 		998A91AD248C11E8004C21E5 /* PrefixData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 998A91AC248C11E8004C21E5 /* PrefixData.swift */; };
 		999D8714248BF1100031B407 /* CallParser.h in Headers */ = {isa = PBXBuildFile; fileRef = 999D8712248BF1100031B407 /* CallParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		999D871B248C07ED0031B407 /* CallLookup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 999D871A248C07ED0031B407 /* CallLookup.swift */; };
+		99E29BD324FD41A800326193 /* CallParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99E29BD224FD41A800326193 /* CallParserTests.swift */; };
+		99E29BD524FD41A800326193 /* CallParser.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 999D870F248BF1100031B407 /* CallParser.framework */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		99E29BD624FD41A800326193 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 999D8706248BF1100031B407 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 999D870E248BF1100031B407;
+			remoteInfo = CallParser;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		9944C39024951BCB004B8C7F /* CallStructure.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallStructure.swift; sourceTree = "<group>"; };
@@ -34,6 +46,9 @@
 		999D8712248BF1100031B407 /* CallParser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CallParser.h; sourceTree = "<group>"; };
 		999D8713248BF1100031B407 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		999D871A248C07ED0031B407 /* CallLookup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallLookup.swift; sourceTree = "<group>"; };
+		99E29BD024FD41A800326193 /* CallParserTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CallParserTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		99E29BD224FD41A800326193 /* CallParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CallParserTests.swift; sourceTree = "<group>"; };
+		99E29BD424FD41A800326193 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,6 +56,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99E29BCD24FD41A800326193 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99E29BD524FD41A800326193 /* CallParser.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				999D8711248BF1100031B407 /* CallParser */,
+				99E29BD124FD41A800326193 /* CallParserTests */,
 				999D8710248BF1100031B407 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -76,6 +100,7 @@
 			isa = PBXGroup;
 			children = (
 				999D870F248BF1100031B407 /* CallParser.framework */,
+				99E29BD024FD41A800326193 /* CallParserTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -96,6 +121,15 @@
 				99610C4F24F16E75003E98C2 /* Extensions.swift */,
 			);
 			path = CallParser;
+			sourceTree = "<group>";
+		};
+		99E29BD124FD41A800326193 /* CallParserTests */ = {
+			isa = PBXGroup;
+			children = (
+				99E29BD224FD41A800326193 /* CallParserTests.swift */,
+				99E29BD424FD41A800326193 /* Info.plist */,
+			);
+			path = CallParserTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -131,23 +165,45 @@
 			productReference = 999D870F248BF1100031B407 /* CallParser.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		99E29BCF24FD41A800326193 /* CallParserTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 99E29BDA24FD41A800326193 /* Build configuration list for PBXNativeTarget "CallParserTests" */;
+			buildPhases = (
+				99E29BCC24FD41A800326193 /* Sources */,
+				99E29BCD24FD41A800326193 /* Frameworks */,
+				99E29BCE24FD41A800326193 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				99E29BD724FD41A800326193 /* PBXTargetDependency */,
+			);
+			name = CallParserTests;
+			productName = CallParserTests;
+			productReference = 99E29BD024FD41A800326193 /* CallParserTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		999D8706248BF1100031B407 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1150;
+				LastSwiftUpdateCheck = 1160;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = "Peter Bourget";
 				TargetAttributes = {
 					999D870E248BF1100031B407 = {
 						CreatedOnToolsVersion = 11.5;
 						LastSwiftMigration = 1150;
 					};
+					99E29BCF24FD41A800326193 = {
+						CreatedOnToolsVersion = 11.6;
+					};
 				};
 			};
 			buildConfigurationList = 999D8709248BF1100031B407 /* Build configuration list for PBXProject "CallParser" */;
-			compatibilityVersion = "Xcode 11.4";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -160,6 +216,7 @@
 			projectRoot = "";
 			targets = (
 				999D870E248BF1100031B407 /* CallParser */,
+				99E29BCF24FD41A800326193 /* CallParserTests */,
 			);
 		};
 /* End PBXProject section */
@@ -172,6 +229,13 @@
 				99611A0524A6C93A00E96FF2 /* pskreporter.csv in Resources */,
 				998A91A7248C10BC004C21E5 /* PrefixList.xml in Resources */,
 				99611A0424A6C93A00E96FF2 /* compound.csv in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		99E29BCE24FD41A800326193 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -213,7 +277,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		99E29BCC24FD41A800326193 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				99E29BD324FD41A800326193 /* CallParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		99E29BD724FD41A800326193 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 999D870E248BF1100031B407 /* CallParser */;
+			targetProxy = 99E29BD624FD41A800326193 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		999D8715248BF1100031B407 /* Debug */ = {
@@ -242,6 +322,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -267,7 +348,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -305,6 +386,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -324,7 +406,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -388,6 +470,44 @@
 			};
 			name = Release;
 		};
+		99E29BD824FD41A800326193 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = JE278GX57V;
+				INFOPLIST_FILE = CallParserTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.w6op.CallParserTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		99E29BD924FD41A800326193 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = JE278GX57V;
+				INFOPLIST_FILE = CallParserTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				PRODUCT_BUNDLE_IDENTIFIER = com.w6op.CallParserTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -405,6 +525,15 @@
 			buildConfigurations = (
 				999D8718248BF1100031B407 /* Debug */,
 				999D8719248BF1100031B407 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		99E29BDA24FD41A800326193 /* Build configuration list for PBXNativeTarget "CallParserTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				99E29BD824FD41A800326193 /* Debug */,
+				99E29BD924FD41A800326193 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

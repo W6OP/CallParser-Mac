@@ -133,16 +133,6 @@ extension PrefixFileParser: XMLParserDelegate {
         let expandedMaskList = expandMask(element: currentValue)
         prefixData.setPrimaryMaskList(value: expandedMaskList)
         buildMaskPattern(primaryMaskList: expandedMaskList)
-//        if prefixData.country == "Indonesia"{
-//          print(currentValue)
-//          buildPattern(primaryMaskList: expandedMaskList)
-//          for (key, value) in callSignDictionary {
-//            if key == "@@#@." {
-//              print("\(key) : \(value.count)")
-//            }
-//          }
-//        }
-        
       }
     }
   }
@@ -154,11 +144,6 @@ extension PrefixFileParser: XMLParserDelegate {
    */
   public func parserDidEndDocument(_ parser: XMLParser) {
     print("document finished")
-    //print("CallSignDictionary Count: \(callSignDictionary.count)")
-    //print("PortablePrefixes Count: \(portablePrefixes.count)")
-//    for (key, value) in portablePrefixes {
-//      print("\(key) : \(value.count)")
-//    }
   }
   
   /**
@@ -172,17 +157,3 @@ extension PrefixFileParser: XMLParserDelegate {
     currentValue = ""
   }
 }
-/**
- TODO:
- portable prefixes
- 
- C#
- Key = @@#/, Value = 540
-
- Swift
- #@@/ : 2
- @@#/ : 541
-
- CallSignDictionary
- slight difference but appear to have to do with invalid prefixes
- */
