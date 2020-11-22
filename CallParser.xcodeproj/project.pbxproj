@@ -78,13 +78,6 @@
 			path = Sources;
 			sourceTree = "<group>";
 		};
-		99610C5124F16E89003E98C2 /* Common */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Common;
-			sourceTree = "<group>";
-		};
 		998A91A5248C105E004C21E5 /* Support Files */ = {
 			isa = PBXGroup;
 			children = (
@@ -116,7 +109,6 @@
 		999D8711248BF1100031B407 /* CallParser */ = {
 			isa = PBXGroup;
 			children = (
-				99610C5124F16E89003E98C2 /* Common */,
 				998A91A5248C105E004C21E5 /* Support Files */,
 				999D8712248BF1100031B407 /* CallParser.h */,
 				999D8713248BF1100031B407 /* Info.plist */,
